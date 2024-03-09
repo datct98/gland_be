@@ -1,11 +1,17 @@
 package com.example.marketing.controller;
+
+import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.User;
 import com.example.marketing.model.response.DataResponse;
-import com.example.marketing.repository.UserRepository;
+import com.example.marketing.service.AccountService;
 import com.example.marketing.util.JWTUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,31 +20,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api-account")
+@RequestMapping("/api/accounts")
+@Slf4j
 public class AccountController {
     @Autowired
-    private UserRepository userRepository;
-
+    private AccountService accountService;
     @Autowired
     private JWTUtil jwtUtil;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllAccounts(@RequestHeader(name="Authorization") String token,
-                                            @RequestParam(required = false) long storeId,
-                                            @RequestParam(required = false) Long departmentId,
-                                            @RequestParam(required = false) int pageNum) throws Exception {
-        token= token.replace("Bearer ","");
-        if(jwtUtil.validateToken(token)){
-            Page<User> userPage;
-            if(departmentId== null)
-                userPage = userRepository.findAllByStoreId(storeId, PageRequest.of(pageNum, 10));
-            else userPage = userRepository.findAllByDepartmentId(departmentId, PageRequest.of(pageNum, 10));
-            return ResponseEntity.ok(new DataResponse<>(userPage.getContent(), userPage.getTotalPages()));
+    @Operation(description = "Used to get list employees. If departmentId != null, it means getAll. Else get the department's employees")
+    @GetMapping
+    public ResponseEntity<?> getUsersByDepartment(@RequestHeader(name="Authorization") String token,
+                                                  @RequestParam(required = false) Integer pageNum,
+                                                  @RequestParam(required = false) Long departmentId){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
-        throw new Exception("Un-authentication");
+
+
+        pageNum = (pageNum == null? 0 : pageNum);
+        Page<User> users = accountService.findByDepartmentId(departmentId, pageNum);
+        List<UserDTO> userDTOS = users.getContent().stream().map(e-> modelMapper.map(e, UserDTO.class)).collect(Collectors.toList());
+        return ResponseEntity.ok(new DataResponse<>(userDTOS, users.getTotalPages()));
     }
 
 }

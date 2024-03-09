@@ -1,5 +1,6 @@
 package com.example.marketing.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,15 +34,11 @@ public class User {
 
     String email;
 
-    String status;
-    @Column(name = "script_id")
-    long scriptId;
+    boolean status;
 
     @Column(name = "department_id")
-    long departmentId;
+    Long departmentId;
 
-    @Column(name = "store_id")
-    long storeId;
     @Column(name = "is_admin")
     private boolean admin;
 
@@ -52,17 +49,4 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     private Date createdAt;
-
-    @Transient
-    private String departmentName;
-
-    public User(long id, String username, String fullName, String phone, String email, String status, String departmentName) {
-        this.id = id;
-        this.username = username;
-        this.fullName = fullName;
-        this.phone = phone;
-        this.email = email;
-        this.status = status;
-        this.departmentName = departmentName;
-    }
 }

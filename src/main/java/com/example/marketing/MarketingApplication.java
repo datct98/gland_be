@@ -1,8 +1,6 @@
 package com.example.marketing;
 
-import com.example.marketing.model.entities.Store;
 import com.example.marketing.model.entities.User;
-import com.example.marketing.repository.StoreRepository;
 import com.example.marketing.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -23,7 +21,7 @@ public class MarketingApplication extends SpringBootServletInitializer implement
     @Autowired
     private AccountService accountService;
     @Autowired
-    private StoreRepository storeRepository;
+    private PasswordEncoder passwordEncoder;
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
@@ -31,8 +29,10 @@ public class MarketingApplication extends SpringBootServletInitializer implement
 
     @Override
     public void run(String... args) throws Exception {
-        String apiUrl = "https://smshub.org/stubs/handler_api.php?api_key=192336U741fdf0fafd82d9b5754040a3d7268d3&action=getStatus&id=503430797";
-        String response = new RestTemplate().getForObject(apiUrl, String.class);
-        System.out.println(response);
+        /*User user = new User();
+        user.setUsername("dat");
+        user.setAdmin(true);
+        user.setPassword("123");
+        accountService.createUser(user,"");*/
     }
 }

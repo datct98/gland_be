@@ -19,6 +19,12 @@ public class DataResponse<T, D> {
         this.message = message;
     }
 
+    public DataResponse(int status, String message, T value) {
+        this.status = status;
+        this.message = message;
+        this.value = value;
+    }
+
     public DataResponse(T value, int totalPage) {
         this.value = value;
         this.totalPage = totalPage;

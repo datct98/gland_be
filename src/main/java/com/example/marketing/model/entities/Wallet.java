@@ -5,9 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Entity
 @Table
@@ -24,4 +26,12 @@ public class Wallet {
     @Column(name = "user_id")
     long userId;
     String name;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at")
+    private Date createdAt;
 }

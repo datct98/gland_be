@@ -1,4 +1,5 @@
 package com.example.marketing.util;
+import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.UserDetail;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -50,6 +51,7 @@ public class JWTUtil {
             jwt = Jwts.builder()
                     .setSubject(Long.toString(userDetail.getUser().getId()))
                     .claim("username", userDetail.getUser().getUsername())
+                    .claim("admin", userDetail.getUser().isAdmin())
                     .setIssuedAt(date)
                     .setExpiration(expiryDate)
                     .signWith(SignatureAlgorithm.HS512, SECRET.getBytes("UTF-8"))
@@ -91,6 +93,24 @@ public class JWTUtil {
         }
     }
 
+    public UserDTO getUserFromJwt(String jwtToken) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET.getBytes("UTF-8")) // Sử dụng cùng secret key để giải mã JWT
+                    .parseClaimsJws(jwtToken)
+                    .getBody();
+
+            // Trích xuất giá trị của trường "username" từ payload
+            String username = claims.get("username", String.class);
+            boolean isAdmin = claims.get("admin", Boolean.class);
+            long id =  Long.parseLong(claims.getSubject());
+            return new UserDTO(id, username, isAdmin);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Xử lý lỗi nếu có
+        }
+    }
+
     // validate jwt
     public boolean validateToken(String authToken) {
         try {
@@ -110,5 +130,15 @@ public class JWTUtil {
             System.out.println("Unsupported Encoding Exception");
         }
         return false;
+    }
+
+    public UserDTO validateTokenAndGetUsername(String bearerToken){
+        if(validateToken(bearerToken.replace("Bearer ",""))){
+            /*String username = getUsernameFromJwt(bearerToken.replace("Bearer ",""));
+            return username;*/
+            UserDTO userDTO = getUserFromJwt(bearerToken.replace("Bearer ",""));
+            return userDTO;
+        }
+        return null;
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/marketing/api-wallet")
+@RequestMapping("/api/wallet")
 @Slf4j
 public class WalletController {
     @Autowired
