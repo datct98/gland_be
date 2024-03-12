@@ -20,7 +20,7 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id
-    @Column(name= "Id")
+    @Column(name= "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
 
@@ -49,4 +49,7 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     private Date createdAt;
+
+    @Transient
+    private String main;
 }

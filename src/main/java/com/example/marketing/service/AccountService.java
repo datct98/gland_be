@@ -1,5 +1,6 @@
 package com.example.marketing.service;
 
+import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.User;
 import com.example.marketing.repository.UserRepository;
 import com.example.marketing.repository.WalletRepository;
@@ -42,9 +43,9 @@ public class AccountService {
         }
     }
 
-    public Page<User> findByDepartmentId(Long departmentId, Integer pageNum){
-        Page<User> userPage = userRepository.findAllByDepartmentIdAndStatusOrderByCreatedAtDesc
-                (departmentId, true, PageRequest.of(pageNum, Constant.PAGE_SIZE));
+    public Page<UserDTO> findByDepartmentId(Long departmentId, Integer pageNum){
+        Page<UserDTO> userPage = userRepository.findAllByDepartmentIdOrderByCreatedAtDesc
+                (departmentId, PageRequest.of(pageNum, Constant.PAGE_SIZE));
         return userPage;
     }
 

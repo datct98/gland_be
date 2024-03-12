@@ -11,6 +11,7 @@ import com.example.marketing.service.AccountService;
 import com.example.marketing.util.Constant;
 import com.example.marketing.util.JWTUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,6 +53,10 @@ public class UserController {
         if(userDTO != null){
             String responseCode = accountService.createUser(body, userDTO.getUsername());
             if(responseCode.equals(Constant.STATUS_SUCCESS)){
+                if(StringUtils.isNotEmpty(body.getMain())){
+                    Page<UserDTO> userPage = userRepository.findAllByDepartmentIdOrderByCreatedAtDesc(null, PageRequest.of(0, 10));
+                    return ResponseEntity.ok(new DataResponse<>(userPage.getContent(), userPage.getTotalPages()));
+                }
                 Page<UserDTO> userPage = userRepository.findAllByDepartmentIdOrderByCreatedAtDesc(body.getDepartmentId(), PageRequest.of(0, 10));
                 return ResponseEntity.ok(new DataResponse<>(userPage.getContent(), userPage.getTotalPages()));
             }

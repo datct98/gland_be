@@ -1,11 +1,13 @@
 package com.example.marketing.controller;
 
+import com.example.marketing.model.dto.DepartmentDTO;
 import com.example.marketing.model.dto.DepartmentScriptDTO;
 import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.Department;
 import com.example.marketing.model.response.DataResponse;
 import com.example.marketing.repository.DepartmentRepository;
 import com.example.marketing.service.DepartmentService;
+import com.example.marketing.util.Constant;
 import com.example.marketing.util.JWTUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/department")
@@ -45,7 +51,10 @@ public class DepartmentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
         departmentService.modifyDepartmentService(body, userDTO.getUsername());
-        return ResponseEntity.ok(new DataResponse<>(HttpStatus.OK.value(), "Thực hiện thành công", departmentRepository.findAllByStatus(true)));
+        Page<DepartmentScriptDTO> departments = departmentService.getPageDepartments(userDTO, 0);
+        List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments.getContent());
+
+        return ResponseEntity.ok(new DataResponse<>(HttpStatus.OK.value(), "Thực hiện thành công", departmentDTOS));
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
@@ -56,9 +65,20 @@ public class DepartmentController {
         if(userDTO == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
-        pageNum = (pageNum == null? 0: pageNum);
-        Page<DepartmentScriptDTO> departments = departmentService.getDepartments(userDTO, pageNum);
-        return ResponseEntity.ok(new DataResponse<>(departments.getContent(), departments.getTotalPages()));
+        if(pageNum!= null ){
+            Page<DepartmentScriptDTO> departments = departmentService.getPageDepartments(userDTO, pageNum);
+            List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments.getContent());
+            if(!userDTO.isAdmin())
+                departmentDTOS = departmentDTOS.stream().filter(e-> Objects.equals(e.getDepartmentId(), userDTO.getDepartmentId())).collect(Collectors.toList());
+            return ResponseEntity.ok(new DataResponse<>(departmentDTOS, departments.getTotalPages()));
+        } else {
+            List<DepartmentScriptDTO> departments = departmentService.getDepartments(userDTO);
+            List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments);
+            if(!userDTO.isAdmin())
+                departmentDTOS = departmentDTOS.stream().filter(e-> Objects.equals(e.getDepartmentId(), userDTO.getDepartmentId())).collect(Collectors.toList());
+            return ResponseEntity.ok(new DataResponse<>(departmentDTOS));
+        }
+
     }
 
 

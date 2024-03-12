@@ -52,6 +52,7 @@ public class JWTUtil {
                     .setSubject(Long.toString(userDetail.getUser().getId()))
                     .claim("username", userDetail.getUser().getUsername())
                     .claim("admin", userDetail.getUser().isAdmin())
+                    .claim("departmentId", userDetail.getUser().getDepartmentId())
                     .setIssuedAt(date)
                     .setExpiration(expiryDate)
                     .signWith(SignatureAlgorithm.HS512, SECRET.getBytes("UTF-8"))
@@ -104,7 +105,8 @@ public class JWTUtil {
             String username = claims.get("username", String.class);
             boolean isAdmin = claims.get("admin", Boolean.class);
             long id =  Long.parseLong(claims.getSubject());
-            return new UserDTO(id, username, isAdmin);
+            Long departmentId = claims.get("departmentId", Long.class);
+            return new UserDTO(id, username, isAdmin, departmentId);
         } catch (Exception e) {
             e.printStackTrace();
             return null; // Xử lý lỗi nếu có

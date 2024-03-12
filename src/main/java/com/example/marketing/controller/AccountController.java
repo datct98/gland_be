@@ -47,9 +47,9 @@ public class AccountController {
 
 
         pageNum = (pageNum == null? 0 : pageNum);
-        Page<User> users = accountService.findByDepartmentId(departmentId, pageNum);
-        List<UserDTO> userDTOS = users.getContent().stream().map(e-> modelMapper.map(e, UserDTO.class)).collect(Collectors.toList());
-        return ResponseEntity.ok(new DataResponse<>(userDTOS, users.getTotalPages()));
+        Page<UserDTO> users = accountService.findByDepartmentId(departmentId, pageNum);
+        //List<UserDTO> userDTOS = users.getContent().stream().map(e-> modelMapper.map(e, UserDTO.class)).collect(Collectors.toList());
+        return ResponseEntity.ok(new DataResponse<>(users.getContent(), users.getTotalPages()));
     }
 
 }

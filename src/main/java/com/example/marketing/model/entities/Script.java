@@ -23,6 +23,8 @@ public class Script {
     @Column(name = "department_id")
     private long departmentId;
 
+    private String note;
+
     @Column(name = "created_by")
     private String createdBy;
 
