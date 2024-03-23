@@ -17,7 +17,7 @@ import java.util.Date;
 @Data
 @Table(name = "Task_Script_Config")
 @Entity
-public class TaskScript {
+public class TaskScriptConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,7 +31,7 @@ public class TaskScript {
     private boolean assigned;
 
     @ColumnDefault(value = "true")
-    private boolean status;
+    private Boolean status;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")

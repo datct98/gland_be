@@ -1,16 +1,23 @@
 package com.example.marketing.model.dto;
 
 import lombok.Data;
-import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.Column;
+import java.util.List;
+
 @Data
-public class TaskStatusDTO {
-    private long taskId;
+public class TaskScriptDTO {
+    private Long taskId;
 
-    private long scriptId;
+    private Long scriptId;
 
-    private boolean created;
+    private String nameTask;
 
-    private boolean assigned;
+    private Double hourDefault;
+    //Từ viết tắt
+    private String acronym;
+
+    private List<RoleScriptDTO> scriptDtos;
+
+
 }
+

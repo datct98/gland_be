@@ -6,6 +6,7 @@ import com.example.marketing.repository.UserRepository;
 import com.example.marketing.repository.WalletRepository;
 import com.example.marketing.util.Constant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +33,7 @@ public class AccountService {
             return Constant.ACCOUNT_EXISTED;
         }
         body.setPassword(passwordEncoder.encode(body.getPassword()));
-        body.setCreatedBy(createdBy);
+        body.setCreatedBy(StringUtils.isNotEmpty(createdBy)?createdBy: body.getCreatedBy());
         body.setStatus(true);
         try {
             userRepository.save(body);
