@@ -7,6 +7,7 @@ import com.example.marketing.model.entities.Department;
 import com.example.marketing.model.entities.Script;
 import com.example.marketing.repository.DepartmentRepository;
 import com.example.marketing.util.Constant;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 public class DepartmentService {
     @Autowired
@@ -27,9 +28,15 @@ public class DepartmentService {
     public void modifyDepartmentService(Department body, String username){
         // Tồn tại thì update
         if(body.getId()!=null){
-            body.setCreatedBy(username);
+            Department department = departmentRepository.findById(body.getId()).orElse(null);
+            if(department == null){
+                log.error("#modifyDepartmentService cant find department with id {} ", body.getId());
+                return;
+            }
+            department.setNote(body.getNote());
+            department.setName(body.getName());
             //body.setStatus(true);
-            departmentRepository.save(body);
+            departmentRepository.save(department);
         } else {
             // Thêm mới
             Department department = new Department();

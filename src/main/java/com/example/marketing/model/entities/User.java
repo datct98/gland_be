@@ -34,7 +34,7 @@ public class User {
 
     String email;
 
-    boolean status;
+    Boolean status;
 
     @Column(name = "department_id")
     Long departmentId;

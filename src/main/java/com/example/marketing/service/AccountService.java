@@ -44,6 +44,23 @@ public class AccountService {
         }
     }
 
+    public String editUser(User body){
+        User user = userRepository.findByUsername(body.getUsername());
+        if(user == null){
+            return Constant.ACCOUNT_NOT_EXISTED;
+        }
+        user.setPassword(passwordEncoder.encode(body.getPassword()));
+        user.setDepartmentId(body.getDepartmentId());
+        user.setEmail(body.getEmail());
+        try {
+            userRepository.save(user);
+            return Constant.STATUS_SUCCESS;
+        } catch (Exception e){
+            log.error("#AccountService - createUser fail - {}", e.getMessage());
+            return Constant.SYS_ERR;
+        }
+    }
+
     public Page<UserDTO> findByDepartmentId(Long departmentId, Integer pageNum){
         Page<UserDTO> userPage = userRepository.findAllByDepartmentIdOrderByCreatedAtDesc
                 (departmentId, PageRequest.of(pageNum, Constant.PAGE_SIZE));

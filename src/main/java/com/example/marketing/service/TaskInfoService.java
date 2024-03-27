@@ -31,6 +31,7 @@ public class TaskInfoService {
         taskInfo.setRequireInput(body.getRequireInput());
         taskInfo.setDisplayOnFilter(body.getDisplayOnFilter());
         taskInfo.setDisplayOnList(body.getDisplayOnList());
+        taskInfo.setStatus(true);
         taskInfoRepository.save(taskInfo);
         return Constant.STATUS_SUCCESS;
     }

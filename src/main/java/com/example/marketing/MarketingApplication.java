@@ -1,6 +1,6 @@
 package com.example.marketing;
 
-import com.example.marketing.model.entities.User;
+import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -22,6 +22,8 @@ public class MarketingApplication extends SpringBootServletInitializer implement
     private AccountService accountService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private WorkRepository workRepository;
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
@@ -34,5 +36,6 @@ public class MarketingApplication extends SpringBootServletInitializer implement
         user.setAdmin(true);
         user.setPassword("123");
         accountService.createUser(user,"");*/
+
     }
 }

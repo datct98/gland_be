@@ -36,7 +36,7 @@ public class TaskInfo {
     @Column(name = "task_id")
     private Long taskId;
     @ColumnDefault("true")
-    private boolean status;
+    private Boolean status;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")

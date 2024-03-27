@@ -26,7 +26,7 @@ public class Department {
     @Column(name = "created_by")
     private String createdBy;
 
-    private boolean status;
+    private Boolean status;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
