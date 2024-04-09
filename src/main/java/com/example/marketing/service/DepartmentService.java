@@ -94,4 +94,18 @@ public class DepartmentService {
 
         return departmentDTOs;
     }
+
+    public String deleteDepartment(int id){
+        Department department = departmentRepository.findById((long) id).orElse(null);
+        if(department == null){
+            return Constant.DEPARTMENT_NOT_EXISTED;
+        }
+        try {
+            departmentRepository.delete(department);
+            return Constant.STATUS_SUCCESS;
+        } catch (Exception e){
+            log.error("#deleteDepartment {}", e.getMessage());
+            return Constant.SYS_ERR;
+        }
+    }
 }

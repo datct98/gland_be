@@ -10,4 +10,5 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     Page<Task> findAllByScriptId(long scriptId, Pageable pageable);
     List<Task> findAllByScriptId(long scriptId);
+    List<Task> findAllByScriptIdIsNot(long scriptId);
 }

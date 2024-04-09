@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class TaskInfoService {
@@ -32,6 +34,16 @@ public class TaskInfoService {
         taskInfo.setDisplayOnFilter(body.getDisplayOnFilter());
         taskInfo.setDisplayOnList(body.getDisplayOnList());
         taskInfo.setStatus(true);
+        // Check nếu là ID nhập tay -> unique for true
+        /*if(body.getIdCustom()){
+            List<TaskInfo> taskInfos = taskInfoRepository.findAllByTaskId(body.getTaskId());
+            for (TaskInfo info: taskInfos){
+                if(info.getIdCustom()){
+                    return Constant.ID_CUSTOM_EXISTED;
+                }
+            }
+        }*/
+        taskInfo.setIdCustom(body.getIdCustom());
         taskInfoRepository.save(taskInfo);
         return Constant.STATUS_SUCCESS;
     }

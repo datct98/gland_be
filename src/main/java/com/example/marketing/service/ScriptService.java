@@ -1,22 +1,30 @@
 package com.example.marketing.service;
 
+import com.example.marketing.model.dto.ScriptConnectDTO;
+import com.example.marketing.model.entities.DataConnection;
 import com.example.marketing.model.entities.Script;
+import com.example.marketing.repository.DataConnectRepository;
 import com.example.marketing.repository.ScriptRepository;
 import com.example.marketing.util.Constant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class ScriptService {
     @Autowired
     private ScriptRepository scriptRepository;
+    @Autowired
+    private DataConnectRepository dataConnectRepository;
 
     public String modifyScript(Script body, String createdBy){
         try {
@@ -48,6 +56,18 @@ public class ScriptService {
         return scripts;
     }
 
+    public List<ScriptConnectDTO> getOtherScripts(long scriptId, long departmentId, String idWork){
+        List<Script> scripts = scriptRepository.findAllByIdIsNotAndDepartmentId(scriptId, departmentId);
+        List<DataConnection> connections = dataConnectRepository.findAllByIdFrom(idWork);
+        List<ScriptConnectDTO> dtos = scripts.stream()
+                .map(script -> new ScriptConnectDTO(script.getId(), script.getName(),
+                        connections.stream()
+                                .anyMatch(connection -> script.getId() == connection.getIdTo() && connection.getConnected())))
+                .collect(Collectors.toList());
+
+        return dtos;
+    }
+
     public String deleteById(long id){
         Script script = scriptRepository.findById(id).orElse(null);
         if(script == null)
@@ -62,5 +82,25 @@ public class ScriptService {
                 return Constant.SYS_ERR;
             }
         }
+    }
+
+    public String connectData(List<DataConnection> bodies){
+        DataConnection connection;
+        List<DataConnection> connections = new ArrayList<>();
+
+        for (DataConnection body: bodies){
+            List<DataConnection> connectionsFound = dataConnectRepository.findAllByIdFromAndIdTo(body.getIdFrom(), body.getIdTo());
+            if(connectionsFound.size()>0){
+                connection = connectionsFound.get(0);
+                connection.setConnected(body.getConnected());
+            } else {
+                connection = new DataConnection();
+                connection.setIdFrom(body.getIdFrom());
+                connection.setIdTo(body.getIdTo());
+            }
+            connections.add(connection);
+        }
+        dataConnectRepository.saveAll(connections);
+        return Constant.STATUS_SUCCESS;
     }
 }

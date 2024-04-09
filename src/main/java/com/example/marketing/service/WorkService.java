@@ -1,6 +1,8 @@
 package com.example.marketing.service;
 
+import com.example.marketing.model.entities.ConfigSystem;
 import com.example.marketing.model.entities.Work;
+import com.example.marketing.repository.ConfigSystemRepository;
 import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.util.Constant;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,9 @@ import java.util.UUID;
 public class WorkService {
     @Autowired
     private WorkRepository workRepository;
+    @Autowired
+    private ConfigSystemRepository configSystemRepository;
+
 
     public String modifyWork(Work body, String createdBy){
         Work work;
@@ -32,8 +37,23 @@ public class WorkService {
                 work.setId(UUID.randomUUID().toString());
                 work.setCreatedBy(createdBy);
                 work.setCreatedAt(new Date(System.currentTimeMillis()));
-                workRepository.save(work);
+                work.setData(body.getData());
+                work.setTaskId(body.getTaskId());
+
+                ConfigSystem config = configSystemRepository.findById(1L).orElse(null);
+                if(config == null){
+                    log.error("#modifyWork ConfigSystem is not found");
+                    return Constant.CONFIG_SYSTEM_NOT_EXISTED;
+                }
+                config.setIdWorkAuto(config.getIdWorkAuto()+1);
+                configSystemRepository.save(config);
+                work.setCode(body.getAcronym()+config.getIdWorkAuto());
+                work.setDepartmentId(body.getDepartmentId());
+                work.setDepartmentName(body.getDepartmentName());
+                work.setScriptId(body.getScriptId());
+                work.setScriptName(body.getScriptName());
             }
+            workRepository.save(work);
         } catch (Exception e){
             log.error("#createWork - Error: {}", e.getMessage());
             return Constant.SYS_ERR;

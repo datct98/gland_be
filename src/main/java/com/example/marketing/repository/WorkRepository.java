@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WorkRepository extends MongoRepository<Work, String> {
-    Page<Work> findAllByTaskIdAndCreatedByOrderByCreatedAt(long taskId, String createdBy, Pageable pageable);
+    Page<Work> findAllByTaskIdAndCreatedByOrderByCreatedAtDesc(long taskId, String createdBy, Pageable pageable);
 }

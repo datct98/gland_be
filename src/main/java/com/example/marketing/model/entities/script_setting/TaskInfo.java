@@ -32,6 +32,8 @@ public class TaskInfo {
     private Boolean displayOnFilter;
     @Column(name = "allow_search")
     private Boolean allowSearch;
+    @Column(name = "id_custom")
+    private Boolean idCustom;
 
     @Column(name = "task_id")
     private Long taskId;

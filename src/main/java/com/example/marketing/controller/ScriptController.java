@@ -2,7 +2,9 @@ package com.example.marketing.controller;
 
 import com.example.marketing.model.dto.DepartmentDTO;
 import com.example.marketing.model.dto.DepartmentScriptDTO;
+import com.example.marketing.model.dto.ScriptConnectDTO;
 import com.example.marketing.model.dto.UserDTO;
+import com.example.marketing.model.entities.DataConnection;
 import com.example.marketing.model.entities.Script;
 import com.example.marketing.model.response.DataResponse;
 import com.example.marketing.service.DepartmentService;
@@ -76,6 +78,39 @@ public class ScriptController {
         }
         Page<Script> scriptPage = scriptService.getScripts(departmentId, PageRequest.of(pageNum, Constant.PAGE_SIZE));
         return ResponseEntity.ok(new DataResponse<>(scriptPage.getContent(), scriptPage.getTotalPages()));
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
+    @Operation(description = "Get other scripts")
+    @GetMapping("/other")
+    public ResponseEntity<?> getScriptsOther(@RequestHeader(name="Authorization") String token,
+                                             @RequestParam long scriptId,
+                                             @RequestParam long departmentId,
+                                             @RequestParam String idWork){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+        List<ScriptConnectDTO> scripts = scriptService.getOtherScripts(scriptId, departmentId, idWork);
+
+        return ResponseEntity.ok(new DataResponse<>(scripts));
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.POST)
+    @Operation(description = "Connect data")
+    @PostMapping("/other")
+    public ResponseEntity<?> connectScriptsOther(@RequestHeader(name="Authorization") String token,
+                                                 @RequestBody List<DataConnection> bodies){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+        String responseCode = scriptService.connectData(bodies);
+        if(Constant.STATUS_SUCCESS.equals(responseCode)){
+            return ResponseEntity.ok(new DataResponse<>("Thao tác thành công"));
+        }
+
+        return ResponseEntity.badRequest().body(new DataResponse<>(Constant.MESSAGE_ERR.get(responseCode)));
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.DELETE)

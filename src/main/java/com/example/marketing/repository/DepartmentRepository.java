@@ -24,6 +24,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     @Query("select new com.example.marketing.model.dto.DepartmentScriptDTO" +
             "(d.id, d.name, s.id, s.name, d.note, s.note, d.createdAt, s.createdAt) " +
             "from Department d left join Script s on d.id = s.departmentId " +
-            "order by d.createdAt desc ")
+            "order by d.createdAt desc , s.createdAt desc")
     List<DepartmentScriptDTO> findAllByCreatedBy(String username, boolean admin);
 }

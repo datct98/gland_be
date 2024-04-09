@@ -56,6 +56,19 @@ public class TaskController {
         return ResponseEntity.ok(new DataResponse<>(tasks.getContent(), tasks.getTotalPages()));
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
+    @Operation(description = "Get other tasks for ket noi du lieu scriptID ")
+    @GetMapping("/other")
+    public ResponseEntity<?> getOtherTasks(@RequestHeader(name="Authorization") String token,
+                                      @RequestParam long scriptId){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+        List<Task> tasks = taskRepository.findAllByScriptIdIsNot(scriptId);
+        return ResponseEntity.ok(new DataResponse<>(tasks));
+    }
+
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.POST)
     @Operation(description = "Used to config or create task")
     @PostMapping
