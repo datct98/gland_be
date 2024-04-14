@@ -97,6 +97,7 @@ public class ScriptService {
                 connection = new DataConnection();
                 connection.setIdFrom(body.getIdFrom());
                 connection.setIdTo(body.getIdTo());
+                connection.setConnected(body.getConnected());
             }
             connections.add(connection);
         }

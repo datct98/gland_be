@@ -1,17 +1,23 @@
 package com.example.marketing.service;
 
 import com.example.marketing.model.entities.ConfigSystem;
+import com.example.marketing.model.entities.DataConnection;
 import com.example.marketing.model.entities.Work;
 import com.example.marketing.repository.ConfigSystemRepository;
+import com.example.marketing.repository.DataConnectRepository;
 import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.util.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,6 +26,8 @@ public class WorkService {
     private WorkRepository workRepository;
     @Autowired
     private ConfigSystemRepository configSystemRepository;
+    @Autowired
+    private DataConnectRepository dataConnectRepository;
 
 
     public String modifyWork(Work body, String createdBy){
@@ -52,6 +60,9 @@ public class WorkService {
                 work.setDepartmentName(body.getDepartmentName());
                 work.setScriptId(body.getScriptId());
                 work.setScriptName(body.getScriptName());
+                work.setIdCustom(body.getIdCustom());
+                work.setIncome(body.getIncome());
+                work.setSpending(body.getSpending());
             }
             workRepository.save(work);
         } catch (Exception e){
@@ -60,6 +71,14 @@ public class WorkService {
         }
 
         return Constant.STATUS_SUCCESS;
+    }
+
+    public Page<Work> getWorksConnected(Pageable pageable, long taskId, long scriptId){
+        // tìm tất cả các nhiệm vụ kêts nối đến kịch bản hiện tại
+        List<DataConnection> dataConnections = dataConnectRepository.findAllByIdToAndConnected(scriptId, true);
+        List<String> ids = dataConnections.stream().map(DataConnection::getIdFrom).collect(Collectors.toList());
+        Page<Work> works = workRepository.findAllByTaskIdAndIdIn(taskId, ids, pageable);
+        return works;
     }
 
 

@@ -35,6 +35,12 @@ public class TaskInfo {
     @Column(name = "id_custom")
     private Boolean idCustom;
 
+    @Column(name = "income")
+    private Boolean income;
+
+    @Column(name = "spending")
+    private Boolean spending;
+
     @Column(name = "task_id")
     private Long taskId;
     @ColumnDefault("true")

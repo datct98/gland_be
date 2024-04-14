@@ -26,6 +26,10 @@ public class Work {
     private long scriptId;
     private String scriptName;
     private String code;
+    @Field(name = "id_custom")
+    private String idCustom;
+    private String income;
+    private String spending;
     private String data;
     @Field(name = "created_at")
     private Date createdAt;

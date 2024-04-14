@@ -6,7 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface WorkRepository extends MongoRepository<Work, String> {
     Page<Work> findAllByTaskIdAndCreatedByOrderByCreatedAtDesc(long taskId, String createdBy, Pageable pageable);
+    Page<Work> findAllByTaskIdAndIdIn(long taskId, List<String> ids, Pageable pageable);
 }

@@ -68,4 +68,22 @@ public class WorkController {
                 (taskId,userDTO.getUsername(), PageRequest.of(pageNum, pageSize));
         return ResponseEntity.ok(page.getContent());
     }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
+    @GetMapping("/connected")
+    public ResponseEntity<?> getConnectedWorks (@RequestHeader(name="Authorization") String token,
+                                       @RequestParam long taskId,
+                                       @RequestParam long scriptId,
+                                       @RequestParam Integer pageNum,
+                                       @RequestParam Integer pageSize){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+
+        pageNum = pageNum == null ? 0 : pageNum;
+        pageSize = pageSize == null ? 10 : pageSize;
+        Page<Work> page = workService.getWorksConnected(PageRequest.of(pageNum, pageSize), taskId, scriptId);
+        return ResponseEntity.ok(page.getContent());
+    }
 }
