@@ -34,6 +34,10 @@ public class TaskInfo {
     private Boolean allowSearch;
     @Column(name = "id_custom")
     private Boolean idCustom;
+    @Column(name = "id_auto")
+    private Boolean idAuto;
+    @Column(name = "pre_code")
+    private String preCode;
 
     @Column(name = "income")
     private Boolean income;

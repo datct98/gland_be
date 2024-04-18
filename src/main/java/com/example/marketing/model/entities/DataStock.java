@@ -1,15 +1,9 @@
-/*
 package com.example.marketing.model.entities;
 
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 @Document(collection = "Data_Stock")
 @Data
@@ -17,8 +11,10 @@ public class DataStock {
     @Id
     @Field(name = "_id")
     private String id;
-    @Field(name = "id_default")
-    private String idDefault;
+    @Field(name = "id_auto")
+    private String idAuto;
+    @Field(name = "pre_code")
+    private String preCode;
     @Field(name = "id_custom")
     private String idCustom;
     @Field(name = "department_id")
@@ -30,4 +26,3 @@ public class DataStock {
     @Field(name = "script_name")
     private String scriptName;
 }
-*/

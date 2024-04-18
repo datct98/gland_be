@@ -44,6 +44,8 @@ public class TaskInfoService {
             }
         }*/
         taskInfo.setIdCustom(body.getIdCustom());
+        taskInfo.setIdAuto(body.getIdAuto());
+        taskInfo.setPreCode(body.getPreCode());
         taskInfo.setIncome(body.getIncome());
         taskInfo.setSpending(body.getSpending());
         taskInfoRepository.save(taskInfo);

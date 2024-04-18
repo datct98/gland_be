@@ -25,7 +25,6 @@ public class Work {
     private String departmentName;
     private long scriptId;
     private String scriptName;
-    private String code;
     @Field(name = "id_custom")
     private String idCustom;
     private String income;
