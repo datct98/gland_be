@@ -8,6 +8,7 @@ import com.example.marketing.repository.DataStockRepository;
 import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.util.JWTUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +35,8 @@ public class DataStockController {
     @GetMapping
     public ResponseEntity<?> getDataStock (@RequestHeader(name="Authorization") String token,
                                        @RequestParam(required = false) String preCode,
-                                       @RequestParam Integer pageNum,
-                                       @RequestParam Integer pageSize){
+                                       @RequestParam(required = false)  Integer pageNum,
+                                       @RequestParam(required = false)  Integer pageSize){
         UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
         if(userDTO == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
@@ -43,7 +44,10 @@ public class DataStockController {
 
         pageNum = pageNum == null ? 0 : pageNum;
         pageSize = pageSize == null ? 10 : pageSize;
-        Page<DataStock> page = dataStockRepository.findAllByPreCode(preCode, PageRequest.of(pageNum, pageSize));
+        Page<DataStock> page;
+        if(StringUtils.isNotEmpty(preCode))
+            page = dataStockRepository.findAllByPreCode(preCode,PageRequest.of(pageNum, pageSize));
+        else page = dataStockRepository.findAll(PageRequest.of(pageNum, pageSize));
         return ResponseEntity.ok(page.getContent());
     }
 }

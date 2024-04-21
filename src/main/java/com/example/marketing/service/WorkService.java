@@ -82,10 +82,10 @@ public class WorkService {
                             dataStock.setIdAuto(map.get(info.getId()+""));
                             dataStock.setIdCustom("");
                             dataStock.setPreCode(info.getPreCode());
-                            dataStock.setDepartmentId(work.getDepartmentId());
-                            dataStock.setDepartmentName(work.getDepartmentName());
-                            dataStock.setScriptId(work.getScriptId());
-                            dataStock.setScriptName(work.getScriptName());
+                            dataStock.setDepartmentId(body.getDepartmentId());
+                            dataStock.setDepartmentName(body.getDepartmentName());
+                            dataStock.setScriptId(body.getScriptId());
+                            dataStock.setScriptName(body.getScriptName());
                             dataStock.setId(UUID.randomUUID().toString());
                             dataStocks.add(dataStock);
                         } else if (info.getIdCustom()) {

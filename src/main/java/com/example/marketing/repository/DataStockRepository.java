@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Repository
 public interface DataStockRepository extends MongoRepository<DataStock, String> {
-    @Query("{ $and: [ :?0 ?0, {} ] }")
-    Page<DataStock> findAllByPreCode(@RequestParam(name = "pre_code") String preCode, Pageable pageable);
+    Page<DataStock> findAllByPreCode(String preCode, Pageable pageable);
+
+    Page<DataStock> findAll(Pageable pageable);
 }
