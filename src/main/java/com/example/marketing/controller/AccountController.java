@@ -42,6 +42,7 @@ public class AccountController {
     @GetMapping
     public ResponseEntity<?> getUsersByDepartment(@RequestHeader(name="Authorization") String token,
                                                   @RequestParam(required = false) Integer pageNum,
+                                                  @RequestParam(required = false) Integer pageSize,
                                                   @RequestParam(required = false) Long departmentId){
         UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
         if(userDTO == null){
@@ -50,7 +51,8 @@ public class AccountController {
 
 
         pageNum = (pageNum == null? 0 : pageNum);
-        Page<UserDTO> users = accountService.findByDepartmentId(departmentId, pageNum);
+        pageSize = (pageSize == null? 10 : pageSize);
+        Page<UserDTO> users = accountService.findByDepartmentId(departmentId, pageNum, pageSize);
         //List<UserDTO> userDTOS = users.getContent().stream().map(e-> modelMapper.map(e, UserDTO.class)).collect(Collectors.toList());
         return ResponseEntity.ok(new DataResponse<>(users.getContent(), users.getTotalPages()));
     }

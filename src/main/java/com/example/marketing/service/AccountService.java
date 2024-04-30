@@ -61,9 +61,9 @@ public class AccountService {
         }
     }
 
-    public Page<UserDTO> findByDepartmentId(Long departmentId, Integer pageNum){
+    public Page<UserDTO> findByDepartmentId(Long departmentId, Integer pageNum, Integer pageSize){
         Page<UserDTO> userPage = userRepository.findAllByDepartmentIdOrderByCreatedAtDesc
-                (departmentId, PageRequest.of(pageNum, Constant.PAGE_SIZE));
+                (departmentId, PageRequest.of(pageNum, pageSize));
         return userPage;
     }
 

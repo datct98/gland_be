@@ -1,8 +1,6 @@
-package com.example.marketing.model.entities;
+package com.example.marketing.model.entities.stock;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,14 +10,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Data
+@Table(name = "Type_Id_Info")
 @Entity
-@Table(name = "Config_System")
-public class ConfigSystem {
+public class TypeIdInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "id_work_auto")
-    private long idWorkAuto;
-    @Column(name = "id_stock_auto")
-    private long idStockAuto;
+    @Column(name = "type_id")
+    private Long typeId;
+    private String field;
+    @Column(name = "data_type")
+    private String dataType;
 }

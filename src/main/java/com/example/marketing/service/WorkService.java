@@ -2,9 +2,7 @@ package com.example.marketing.service;
 
 import com.example.marketing.model.entities.ConfigSystem;
 import com.example.marketing.model.entities.DataConnection;
-import com.example.marketing.model.entities.DataStock;
 import com.example.marketing.model.entities.Work;
-import com.example.marketing.model.entities.script_setting.TaskInfo;
 import com.example.marketing.repository.ConfigSystemRepository;
 import com.example.marketing.repository.DataConnectRepository;
 import com.example.marketing.repository.DataStockRepository;
@@ -19,12 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -67,7 +61,7 @@ public class WorkService {
                     return Constant.CONFIG_SYSTEM_NOT_EXISTED;
                 }
                 ObjectMapper objectMapper = new ObjectMapper();
-                if(StringUtils.isNotEmpty(body.getData())){
+                /*if(StringUtils.isNotEmpty(body.getData())){
                     Map<String, String> map = objectMapper.readValue(body.getData(), HashMap.class);
                     Set<String> keys = map.keySet();
                     List<Long> ids = keys.stream().map(Long::parseLong).collect(Collectors.toList());
@@ -102,12 +96,12 @@ public class WorkService {
                     }
 
                     configSystemRepository.save(config);
-                    if(dataStocks.size()>0)
-                        dataStockRepository.saveAll(dataStocks);
+                    *//*if(dataStocks.size()>0)
+                        dataStockRepository.saveAll(dataStocks);*//*
 
                     String jsonData = objectMapper.writeValueAsString(map);
                     work.setData(jsonData);
-                }
+                }*/
 
                 work.setDepartmentId(body.getDepartmentId());
                 work.setDepartmentName(body.getDepartmentName());

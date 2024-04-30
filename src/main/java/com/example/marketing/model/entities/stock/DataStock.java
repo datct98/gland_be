@@ -1,4 +1,4 @@
-package com.example.marketing.model.entities;
+package com.example.marketing.model.entities.stock;
 
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,11 +18,18 @@ public class DataStock {
     @Field(name = "id_custom")
     private String idCustom;
     @Field(name = "department_id")
-    private long departmentId;
+    private Long departmentId;
     @Field(name = "department_name")
     private String departmentName;
     @Field(name = "script_id")
-    private long scriptId;
+    private Long scriptId;
     @Field(name = "script_name")
     private String scriptName;
+    @Field(name = "type_id")
+    private String typeId;
+    @Field(name = "type_name")
+    private String typeName;
+    private String data;
+    @Field(name = "created_by")
+    private String createdBy;
 }
