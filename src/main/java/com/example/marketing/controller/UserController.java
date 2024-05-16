@@ -51,6 +51,9 @@ public class UserController {
                                      @RequestHeader(name="Authorization") String token) throws Exception {
         UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
         if(userDTO != null){
+            if("leader".equalsIgnoreCase(body.getRole()) && !userDTO.isAdmin()){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new DataResponse<>(403, "Not allow"));
+            }
             String responseCode = accountService.createUser(body, userDTO.getUsername());
             if(responseCode.equals(Constant.STATUS_SUCCESS)){
                 if(StringUtils.isNotEmpty(body.getMain())){

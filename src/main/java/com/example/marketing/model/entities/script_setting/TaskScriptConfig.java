@@ -28,7 +28,9 @@ public class TaskScriptConfig {
     @ColumnDefault("false")
     private boolean created;
     @ColumnDefault("false")
-    private boolean assigned;
+    private Boolean assigned;
+    @ColumnDefault("false")
+    private Boolean committed;
 
     @ColumnDefault(value = "true")
     private Boolean status;

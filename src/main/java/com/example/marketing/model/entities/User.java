@@ -49,6 +49,7 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     private Date createdAt;
+    private String role;
 
     @Transient
     private String main;

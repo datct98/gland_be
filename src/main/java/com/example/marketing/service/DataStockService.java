@@ -46,7 +46,9 @@ public class DataStockService {
             if(configSystem == null){
                 return "Không tìm thấy cấu hình hệ thống";
             }
-            stock.setIdAuto(stock.getPreCode()+""+configSystem.getIdStockAuto());
+            stock.setIdAuto(body.getPreCode()+""+configSystem.getIdStockAuto());
+            configSystem.setIdStockAuto(configSystem.getIdStockAuto()+1);
+            configSystemRepository.save(configSystem);
         }
         stock.setTypeId(body.getTypeId());
         stock.setDepartmentId(body.getDepartmentId());
@@ -54,7 +56,7 @@ public class DataStockService {
         stock.setScriptId(body.getScriptId());
         stock.setScriptName(body.getScriptName());
         stock.setIdCustom(body.getIdCustom());
-        stock.setIdAuto(body.getIdAuto());
+        //stock.setIdAuto(body.getIdAuto());
         stock.setPreCode(body.getPreCode());
         stock.setData(body.getData());
         dataStockRepository.save(stock);

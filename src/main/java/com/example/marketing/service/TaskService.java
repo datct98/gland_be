@@ -3,7 +3,10 @@ package com.example.marketing.service;
 import com.example.marketing.model.dto.RoleScriptDTO;
 import com.example.marketing.model.dto.TaskScriptDTO;
 import com.example.marketing.model.entities.script_setting.Task;
+import com.example.marketing.model.entities.script_setting.TaskInfo;
 import com.example.marketing.model.entities.script_setting.TaskScriptConfig;
+import com.example.marketing.model.entities.stock.TypeIdInfo;
+import com.example.marketing.repository.TaskInfoRepository;
 import com.example.marketing.repository.TaskRepository;
 import com.example.marketing.repository.TaskScriptConfigRepository;
 import com.example.marketing.util.Constant;
@@ -25,6 +28,8 @@ public class TaskService {
     private TaskRepository taskRepository;
     @Autowired
     private TaskScriptConfigRepository taskScriptConfigRepository;
+    @Autowired
+    private TaskInfoRepository taskInfoRepository;
 
     public String modifyTask(TaskScriptDTO body){
         try{
@@ -32,7 +37,7 @@ public class TaskService {
             if(body.getTaskId() == null){
                 task = new Task();
                 task.setName(body.getNameTask());
-                task.setAcronym(body.getAcronym());
+                //task.setAcronym(body.getAcronym());
                 task.setHourDefault(body.getHourDefault());
                 task.setScriptId(body.getScriptId());
             } else {
@@ -43,7 +48,38 @@ public class TaskService {
                 task.setHourDefault(body.getHourDefault()!=null?
                         body.getHourDefault(): task.getHourDefault());
                 task.setName(StringUtils.isNotEmpty(body.getNameTask())? body.getNameTask(): task.getName());
-                task.setAcronym(StringUtils.isNotEmpty(body.getAcronym())? body.getAcronym(): task.getAcronym());
+                task.setTypeId(body.getIdAuto()? "idAuto": "idCustom");
+                if(StringUtils.isNotEmpty(body.getPreCode()) && body.getIdAuto()){
+                    List<Task> tasks = taskRepository.findAllByPreCode(body.getPreCode());
+                    if(tasks.size()>0){
+                        return "Từ viết tắt đã tồn tại";
+                    }
+                    task.setPreCode(body.getPreCode());
+                }
+                if(!body.getIdAuto()){
+                    task.setPreCode(null);
+                }
+
+                //Set data for task Id
+                List<TaskInfo> infos = body.getInfos();
+                List<TaskInfo> infoNews = new ArrayList<>();
+                for(TaskInfo info: infos){
+                    TaskInfo infoNew;
+                    if(info.getId() == null || info.getId() == 0){
+                        infoNew = new TaskInfo();
+                    } else {
+                        infoNew = taskInfoRepository.findById(info.getId()).orElse(null);
+                        if(infoNew == null){
+                            return "Không tìm thấy id info: "+info.getId();
+                        }
+                    }
+                    infoNew.setDataType(info.getDataType());
+                    infoNew.setField(info.getField());
+                    infoNew.setTaskId(info.getTaskId());
+                    infoNews.add(infoNew);
+                }
+                taskInfoRepository.saveAll(infoNews);
+
             }
             // Set data for task
             taskRepository.save(task);
@@ -57,8 +93,9 @@ public class TaskService {
                     // Update quyền truy cập
                     Map<Long, RoleScriptDTO> mapRole = body.getScriptDtos().stream().collect(Collectors.toMap(RoleScriptDTO::getScriptId, e-> e));
                     taskScriptConfigs.forEach(e->{
-                        e.setCreated(mapRole.get(e.getScriptId()).getCreated());
+                        //e.setCreated(mapRole.get(e.getScriptId()).getCreated());
                         e.setAssigned(mapRole.get(e.getScriptId()).getAssigned());
+                        e.setCommitted(mapRole.get(e.getScriptId()).getCommitted());
                     });
                     taskScriptConfigRepository.saveAll(taskScriptConfigs);
                     saveOtherRoleTask(taskScriptConfigs, body);
@@ -70,7 +107,8 @@ public class TaskService {
                         config.setTaskId(task.getId());
                         config.setScriptId(roleScript.getScriptId());
                         config.setAssigned(roleScript.getAssigned());
-                        config.setCreated(roleScript.getCreated());
+                        config.setStatus(true);
+                        //config.setCreated(roleScript.getCreated());
                         taskScriptConfigsNew.add(config);
                     }
                     taskScriptConfigRepository.saveAll(taskScriptConfigsNew);
@@ -96,7 +134,8 @@ public class TaskService {
                     config.setScriptId(scriptDTO.getScriptId());
                     config.setTaskId(body.getTaskId());
                     config.setAssigned(scriptDTO.getAssigned());
-                    config.setCreated(scriptDTO.getCreated());
+                    //config.setCreated(scriptDTO.getCreated());
+                    config.setCommitted(scriptDTO.getCommitted());
                     taskScriptConfigsNew.add(config);
                 }
             }
@@ -104,4 +143,21 @@ public class TaskService {
         }
     }
 
+    public TaskScriptDTO getDetail(long taskId){
+        Task task = taskRepository.findById(taskId).orElse(null);
+        if(task!= null){
+            List<TaskInfo> infos = taskInfoRepository.findAllByTaskId(taskId);
+            TaskScriptDTO dto = new TaskScriptDTO();
+            dto.setTaskId(taskId);
+            dto.setNameTask(task.getName());
+            dto.setHourDefault(task.getHourDefault());
+            dto.setInfos(infos);
+            dto.setScriptId(task.getScriptId());
+            dto.setPreCode(task.getPreCode());
+            dto.setIdAuto("idAuto".equalsIgnoreCase(task.getTypeId()));
+            dto.setIdCustom("idCustom".equalsIgnoreCase(task.getTypeId()));
+            return dto;
+        }
+        return null;
+    }
 }

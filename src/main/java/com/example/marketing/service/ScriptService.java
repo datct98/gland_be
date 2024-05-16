@@ -3,8 +3,10 @@ package com.example.marketing.service;
 import com.example.marketing.model.dto.ScriptConnectDTO;
 import com.example.marketing.model.entities.DataConnection;
 import com.example.marketing.model.entities.Script;
+import com.example.marketing.model.entities.Work;
 import com.example.marketing.repository.DataConnectRepository;
 import com.example.marketing.repository.ScriptRepository;
+import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.util.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +27,8 @@ public class ScriptService {
     private ScriptRepository scriptRepository;
     @Autowired
     private DataConnectRepository dataConnectRepository;
+    @Autowired
+    private WorkRepository workRepository;
 
     public String modifyScript(Script body, String createdBy){
         try {
@@ -57,7 +61,12 @@ public class ScriptService {
     }
 
     public List<ScriptConnectDTO> getOtherScripts(long scriptId, long departmentId, String idWork){
-        List<Script> scripts = scriptRepository.findAllByIdIsNotAndDepartmentId(scriptId, departmentId);
+        Work work = workRepository.findById(idWork).orElse(null);
+        if(work == null){
+            log.error("Không tìm thấy công vc có id: "+idWork);
+            return null;
+        }
+        List<Script> scripts = scriptRepository.findByIdIsNotAndDepartmentId(scriptId, departmentId, work.getTaskId());
         List<DataConnection> connections = dataConnectRepository.findAllByIdFrom(idWork);
         List<ScriptConnectDTO> dtos = scripts.stream()
                 .map(script -> new ScriptConnectDTO(script.getId(), script.getName(),

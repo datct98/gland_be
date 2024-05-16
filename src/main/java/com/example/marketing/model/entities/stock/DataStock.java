@@ -26,7 +26,7 @@ public class DataStock {
     @Field(name = "script_name")
     private String scriptName;
     @Field(name = "type_id")
-    private String typeId;
+    private Long typeId;
     @Field(name = "type_name")
     private String typeName;
     private String data;

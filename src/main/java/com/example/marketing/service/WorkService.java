@@ -38,22 +38,30 @@ public class WorkService {
 
 
     public String modifyWork(Work body, String createdBy){
-        Work work;
+        //Work work;
         try {
             if(StringUtils.isNotEmpty(body.getId())){
-                work = workRepository.findById(body.getId()).orElse(null);
-                if(work == null){
+
+                Work work = workRepository.findById(body.getId()).orElse(null);
+                if(work == null ){
                     log.error("#createWork khong tim thay Work id ={}", body.getId());
                     return Constant.WORK_NOT_EXISTED;
                 }
                 work.setData(body.getData());
+                workRepository.save(work);
             } else {
-                work = new Work();
+                Work work = new Work();
                 work.setId(UUID.randomUUID().toString());
+                work.setIdWork(work.getId());
                 work.setCreatedBy(createdBy);
                 work.setCreatedAt(new Date(System.currentTimeMillis()));
                 work.setData(body.getData());
+
                 work.setTaskId(body.getTaskId());
+                work.setDepartmentId(body.getDepartmentId());
+                work.setDepartmentName(body.getDepartmentName());
+                work.setScriptId(body.getScriptId());
+                work.setScriptName(body.getScriptName());
 
                 ConfigSystem config = configSystemRepository.findById(1L).orElse(null);
                 if(config == null){
@@ -61,57 +69,12 @@ public class WorkService {
                     return Constant.CONFIG_SYSTEM_NOT_EXISTED;
                 }
                 ObjectMapper objectMapper = new ObjectMapper();
-                /*if(StringUtils.isNotEmpty(body.getData())){
-                    Map<String, String> map = objectMapper.readValue(body.getData(), HashMap.class);
-                    Set<String> keys = map.keySet();
-                    List<Long> ids = keys.stream().map(Long::parseLong).collect(Collectors.toList());
-                    List<TaskInfo> infos = taskInfoRepository.findAllByIdIn(ids);
-                    List<DataStock> dataStocks = new ArrayList<>();
-
-                    for (TaskInfo info: infos){
-                        if(info.getIdAuto()){
-                            DataStock dataStock = new DataStock();
-                            config.setIdWorkAuto(config.getIdWorkAuto() +1);
-                            map.put(info.getId()+"", info.getPreCode()+""+config.getIdWorkAuto());
-                            dataStock.setIdAuto(map.get(info.getId()+""));
-                            dataStock.setIdCustom("");
-                            dataStock.setPreCode(info.getPreCode());
-                            dataStock.setDepartmentId(body.getDepartmentId());
-                            dataStock.setDepartmentName(body.getDepartmentName());
-                            dataStock.setScriptId(body.getScriptId());
-                            dataStock.setScriptName(body.getScriptName());
-                            dataStock.setId(UUID.randomUUID().toString());
-                            dataStocks.add(dataStock);
-                        } else if (info.getIdCustom()) {
-                            DataStock dataStock = new DataStock();
-                            dataStock.setIdCustom(map.get(info.getId()+""));
-                            dataStock.setIdAuto("");
-                            dataStock.setDepartmentId(body.getDepartmentId());
-                            dataStock.setDepartmentName(body.getDepartmentName());
-                            dataStock.setScriptId(body.getScriptId());
-                            dataStock.setScriptName(body.getScriptName());
-                            dataStock.setId(UUID.randomUUID().toString());
-                            dataStocks.add(dataStock);
-                        }
-                    }
-
-                    configSystemRepository.save(config);
-                    *//*if(dataStocks.size()>0)
-                        dataStockRepository.saveAll(dataStocks);*//*
-
-                    String jsonData = objectMapper.writeValueAsString(map);
-                    work.setData(jsonData);
-                }*/
-
-                work.setDepartmentId(body.getDepartmentId());
-                work.setDepartmentName(body.getDepartmentName());
-                work.setScriptId(body.getScriptId());
-                work.setScriptName(body.getScriptName());
                 work.setIdCustom(body.getIdCustom());
                 work.setIncome(body.getIncome());
                 work.setSpending(body.getSpending());
+                workRepository.save(work);
             }
-            workRepository.save(work);
+
         } catch (Exception e){
             log.error("#createWork - Error: {}", e.getMessage());
             return Constant.SYS_ERR;

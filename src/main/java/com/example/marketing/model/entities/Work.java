@@ -12,14 +12,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Document(collection = "Work")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class Work {
     @Id
-    @Field(name = "_id")
+    //@Field(name = "_id")
     private String id;
     @Field(name = "task_id")
     private long taskId;
+    @Field(name = "id_work")
+    private String idWork;
     private String acronym;
     private long departmentId;
     private String departmentName;

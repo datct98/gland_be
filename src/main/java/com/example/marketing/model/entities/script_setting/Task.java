@@ -25,7 +25,12 @@ public class Task {
     @Column(name = "hour_default", columnDefinition = "DOUBLE PRECISION DEFAULT 24.0")
     private Double hourDefault;
     //Từ viết tắt
-    private String acronym;
+    //private String acronym;
+    @Column(name = "pre_code")
+    private String preCode;
+    // idAuto | idCustom
+    @Column(name = "type_id")
+    private String typeId;
     @Column(name = "script_id")
     private long scriptId;
 

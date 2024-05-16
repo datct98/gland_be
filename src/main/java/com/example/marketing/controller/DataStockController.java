@@ -66,9 +66,9 @@ public class DataStockController {
         pageSize = pageSize == null ? 10 : pageSize;
         Page<DataStock> page;
         if(typeId == null)
-            page = dataStockRepository.findAllByTypeId(typeId,PageRequest.of(pageNum, pageSize));
-        else page = dataStockRepository.findAll(PageRequest.of(pageNum, pageSize));
-        return ResponseEntity.ok(page.getContent());
+            page = dataStockRepository.findAll(PageRequest.of(pageNum, pageSize));
+        else page = dataStockRepository.findAllByTypeId(typeId,PageRequest.of(pageNum, pageSize));
+        return ResponseEntity.ok(new DataResponse<>(page.getContent(), page.getTotalPages()));
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.POST)
@@ -83,7 +83,7 @@ public class DataStockController {
         String response = dataStockService.modify(body);
         if(Constant.STATUS_SUCCESS.equals(response))
             return ResponseEntity.ok("Thao tác thành công");
-        return ResponseEntity.badRequest().body(new DataResponse<>(400, response));
+        return ResponseEntity.badRequest().body(response);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.POST)

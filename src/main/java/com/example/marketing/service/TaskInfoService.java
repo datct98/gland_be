@@ -51,4 +51,13 @@ public class TaskInfoService {
         taskInfoRepository.save(taskInfo);
         return Constant.STATUS_SUCCESS;
     }
+
+    public String deleteInfo(long id){
+        TaskInfo info = taskInfoRepository.findById(id).orElse(null);
+        if(info == null){
+            return Constant.TASK_NOT_EXISTED;
+        }
+        taskInfoRepository.delete(info);
+        return Constant.STATUS_SUCCESS;
+    }
 }

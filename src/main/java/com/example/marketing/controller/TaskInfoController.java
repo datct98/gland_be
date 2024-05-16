@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,6 +59,22 @@ public class TaskInfoController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
         String responseCode = taskInfoService.modifyTaskInfo(body);
+        if(Constant.TASK_STATUS_NOT_EXISTED.equals(responseCode)){
+            return ResponseEntity.badRequest().body(new DataResponse<>(Constant.MESSAGE_ERR.get(responseCode)));
+        }
+        return ResponseEntity.ok(new DataResponse<>("Thao tác thành công"));
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.DELETE)
+    @Operation(description = "Delete a field of task")
+    @DeleteMapping
+    public ResponseEntity<?> deleteTaskInfo(@RequestHeader(name="Authorization") String token,
+                                            @RequestParam long id){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+        String responseCode = taskInfoService.deleteInfo(id);
         if(Constant.TASK_STATUS_NOT_EXISTED.equals(responseCode)){
             return ResponseEntity.badRequest().body(new DataResponse<>(Constant.MESSAGE_ERR.get(responseCode)));
         }

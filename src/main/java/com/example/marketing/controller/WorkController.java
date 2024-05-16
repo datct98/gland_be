@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -66,7 +67,23 @@ public class WorkController {
         pageSize = pageSize == null ? 10 : pageSize;
         Page<Work> page = workRepository.findAllByTaskIdAndCreatedByOrderByCreatedAtDesc
                 (taskId,userDTO.getUsername(), PageRequest.of(pageNum, pageSize));
-        return ResponseEntity.ok(page.getContent());
+        return ResponseEntity.ok(new DataResponse<>(page.getContent(), page.getTotalPages()));
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
+    @GetMapping("{id}")
+    public ResponseEntity<?> getDetailWork (@RequestHeader(name="Authorization") String token,
+                                            @PathVariable String id){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+
+        Work work = workRepository.findById(id).orElse(null);
+        if(work == null){
+            ResponseEntity.badRequest().body(new DataResponse<>(400,"Không tìm thấy id: "+id));
+        }
+        return ResponseEntity.ok(work);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
@@ -84,6 +101,6 @@ public class WorkController {
         pageNum = pageNum == null ? 0 : pageNum;
         pageSize = pageSize == null ? 10 : pageSize;
         Page<Work> page = workService.getWorksConnected(PageRequest.of(pageNum, pageSize), taskId, scriptId);
-        return ResponseEntity.ok(page.getContent());
+        return ResponseEntity.ok(new DataResponse<>(page.getContent(), page.getTotalPages()));
     }
 }

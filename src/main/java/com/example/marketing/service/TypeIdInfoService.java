@@ -70,6 +70,8 @@ public class TypeIdInfoService {
         dto.setId(typeId.getId());
         dto.setName(typeId.getName());
         dto.setNote(typeId.getNote());
+        dto.setType(typeId.getType());
+        dto.setPreCode(typeId.getPreCode());
         dto.setInfos(infos);
         return dto;
     }

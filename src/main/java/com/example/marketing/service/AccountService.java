@@ -35,6 +35,9 @@ public class AccountService {
         body.setPassword(passwordEncoder.encode(body.getPassword()));
         body.setCreatedBy(StringUtils.isNotEmpty(createdBy)?createdBy: body.getCreatedBy());
         body.setStatus(true);
+        if(StringUtils.isEmpty(body.getRole())){
+            body.setRole("staff");
+        }
         try {
             userRepository.save(body);
             return Constant.STATUS_SUCCESS;
@@ -52,6 +55,11 @@ public class AccountService {
         user.setPassword(passwordEncoder.encode(body.getPassword()));
         user.setDepartmentId(body.getDepartmentId());
         user.setEmail(body.getEmail());
+        if(StringUtils.isEmpty(body.getRole())){
+            user.setRole("staff");
+        } else {
+            user.setRole(body.getRole());
+        }
         try {
             userRepository.save(user);
             return Constant.STATUS_SUCCESS;

@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -43,7 +44,8 @@ public class TaskController {
     @GetMapping
     public ResponseEntity<?> getTasks(@RequestHeader(name="Authorization") String token,
                                       @RequestParam long scriptId,
-                                      @RequestParam(required = false) Integer pageNum){
+                                      @RequestParam(required = false) Integer pageNum,
+                                      @RequestParam(required = false) Integer pageSize){
         UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
         if(userDTO == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
@@ -54,6 +56,22 @@ public class TaskController {
         }
         Page<Task> tasks = taskRepository.findAllByScriptId(scriptId, PageRequest.of(pageNum, Constant.PAGE_SIZE));
         return ResponseEntity.ok(new DataResponse<>(tasks.getContent(), tasks.getTotalPages()));
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
+    @Operation(description = "Get detail task by ID ")
+    @GetMapping("{id}")
+    public ResponseEntity<?> getTaskDetail(@RequestHeader(name="Authorization") String token,
+                                      @PathVariable long id){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+        TaskScriptDTO response = taskService.getDetail(id);
+        if(response == null){
+            return ResponseEntity.badRequest().body(new DataResponse<>(400, "Không tìm thấy id: "+id));
+        }
+        return ResponseEntity.ok(response);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
@@ -82,7 +100,7 @@ public class TaskController {
         if(Constant.STATUS_SUCCESS.equals(responseCode)){
             return ResponseEntity.ok(new DataResponse<>(HttpStatus.OK.value(), "Thao tác thành công!"));
         }
-        return ResponseEntity.badRequest().body(new DataResponse<>(Integer.parseInt(responseCode), Constant.MESSAGE_ERR.get(responseCode)));
+        return ResponseEntity.badRequest().body(new DataResponse<>(responseCode));
     }
 
 

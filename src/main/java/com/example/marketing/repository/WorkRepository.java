@@ -12,4 +12,7 @@ import java.util.List;
 public interface WorkRepository extends MongoRepository<Work, String> {
     Page<Work> findAllByTaskIdAndCreatedByOrderByCreatedAtDesc(long taskId, String createdBy, Pageable pageable);
     Page<Work> findAllByTaskIdAndIdIn(long taskId, List<String> ids, Pageable pageable);
+    List<Work> findAllByIdWork(String idWork);
+
+    Work findByIdWork(String idWork);
 }
