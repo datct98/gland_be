@@ -1,5 +1,6 @@
 package com.example.marketing.util;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Constant {
@@ -32,4 +33,8 @@ public class Constant {
             CONNECTION_NOT_EXISTED, "Không tìm thấy dữ liệu kết nối");
 
 
+    public interface MESSAGE_ER{
+        String PERMISSION_DENIED = "PERMISSION_DENIED";
+        String TYPE_ID_NULL = "TypeId không tồn tại";
+    }
 }

@@ -19,7 +19,7 @@ public interface ScriptRepository extends JpaRepository<Script, Long> {
     List<Script> findAllByIdIsNotAndDepartmentId(long scriptId, long departmentId);
 
     @Query("select s from Script s join TaskScriptConfig t on s.id = t.scriptId " +
-            "where s.departmentId =:departmentId and t.id =:taskId and t.assigned is true " +
+            "where s.departmentId =:departmentId and t.taskId =:taskId and t.assigned is true " +
             "and s.id is not :scriptId")
     List<Script> findByIdIsNotAndDepartmentId(long scriptId, long departmentId, long taskId);
 

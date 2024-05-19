@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String userName);
 
@@ -24,4 +26,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "left join Department  d on u.departmentId= d.id where (:departmentId is null or u.departmentId=:departmentId) " +
             "and u.status =true order by u.createdAt desc ")
     Page<UserDTO> findAllByDepartmentIdOrderByCreatedAtDesc(Long departmentId, Pageable pageable);
+
+    @Query("select new com.example.marketing.model.dto.UserDTO(u.id, u.username, u.admin, u.departmentId, u.role) " +
+            "from User u where u.departmentId =:departmentId and u.role =:role")
+    List<UserDTO> findAllByRoleAndDepartmentId(String role, long departmentId);
+
+    User findByIdAndAdminFalse(long id);
 }

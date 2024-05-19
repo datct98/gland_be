@@ -123,9 +123,9 @@ public class ScriptController {
         if(userDTO == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
-        if(!userDTO.isAdmin())
+        if(!userDTO.isAdmin() && !"leader".equalsIgnoreCase(userDTO.getRole()))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new DataResponse<>(HttpStatus.FORBIDDEN.value(), "Bạn không có quyền thao tác"));
-        String responseCode = scriptService.deleteById(scriptId);
+        String responseCode = scriptService.deleteById(scriptId, userDTO.getDepartmentId(), userDTO.isAdmin());
         if(!responseCode.equals(Constant.STATUS_SUCCESS))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new DataResponse<>(Constant.MESSAGE_ERR.get(responseCode)));
         return ResponseEntity.ok(new DataResponse<>(Constant.MESSAGE_ERR.get(responseCode)));

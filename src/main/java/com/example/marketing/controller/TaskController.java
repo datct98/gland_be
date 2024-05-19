@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -103,5 +104,25 @@ public class TaskController {
         return ResponseEntity.badRequest().body(new DataResponse<>(responseCode));
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.DELETE)
+    @Operation(description = "Used to delete task")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTask(@RequestHeader(name="Authorization") String token,
+                                        @PathVariable long id){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+
+        if(!userDTO.isAdmin() && !"leader".equalsIgnoreCase(userDTO.getRole()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new DataResponse<>(HttpStatus.FORBIDDEN.value(), "Bạn không có quyền thao tác"));
+
+        String response = taskService.deleteTask(id);
+        if(Constant.STATUS_SUCCESS.equals(response)){
+            return ResponseEntity.ok(new DataResponse<>(HttpStatus.OK.value(), "Thao tác thành công!"));
+        }
+        return ResponseEntity.badRequest().body(new DataResponse<>(response));
+
+    }
 
 }

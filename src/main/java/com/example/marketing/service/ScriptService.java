@@ -1,11 +1,16 @@
 package com.example.marketing.service;
 
 import com.example.marketing.model.dto.ScriptConnectDTO;
+import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.DataConnection;
+import com.example.marketing.model.entities.Department;
 import com.example.marketing.model.entities.Script;
+import com.example.marketing.model.entities.User;
 import com.example.marketing.model.entities.Work;
 import com.example.marketing.repository.DataConnectRepository;
+import com.example.marketing.repository.DepartmentRepository;
 import com.example.marketing.repository.ScriptRepository;
+import com.example.marketing.repository.UserRepository;
 import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.util.Constant;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +34,8 @@ public class ScriptService {
     private DataConnectRepository dataConnectRepository;
     @Autowired
     private WorkRepository workRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public String modifyScript(Script body, String createdBy){
         try {
@@ -77,12 +84,16 @@ public class ScriptService {
         return dtos;
     }
 
-    public String deleteById(long id){
+    public String deleteById(long id, long departmentId, Boolean isAdmin){
         Script script = scriptRepository.findById(id).orElse(null);
         if(script == null)
             return Constant.SCRIPT_NOT_EXISTED;
         else {
             try {
+                if(!isAdmin || script.getDepartmentId()!= departmentId){
+                    log.error("User doesnt have permission to delete script id: "+id);
+                    return Constant.SYS_ERR;
+                }
                 scriptRepository.delete(script);
                 log.info("deleteById - delete script with id: {} successfully", id);
                 return Constant.STATUS_SUCCESS;
@@ -96,6 +107,7 @@ public class ScriptService {
     public String connectData(List<DataConnection> bodies){
         DataConnection connection;
         List<DataConnection> connections = new ArrayList<>();
+        List<Work> works = new ArrayList<>();
 
         for (DataConnection body: bodies){
             List<DataConnection> connectionsFound = dataConnectRepository.findAllByIdFromAndIdTo(body.getIdFrom(), body.getIdTo());
@@ -108,9 +120,20 @@ public class ScriptService {
                 connection.setIdTo(body.getIdTo());
                 connection.setConnected(body.getConnected());
             }
+            Work work = workRepository.findById(body.getIdFrom()).orElse(null);
+            if(work == null){
+                return "Không tìm thấy work id:"+body.getIdFrom();
+            }
+            List<UserDTO> users = userRepository.findAllByRoleAndDepartmentId("leader",work.getDepartmentId());
+            if(users.size() >0){
+                work.setAssignee(users.get(0).getUsername());
+                works.add(work);
+            }
             connections.add(connection);
         }
         dataConnectRepository.saveAll(connections);
+        if(works.size()>0)
+            workRepository.saveAll(works);
         return Constant.STATUS_SUCCESS;
     }
 }

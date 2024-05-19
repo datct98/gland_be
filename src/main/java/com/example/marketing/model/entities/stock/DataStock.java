@@ -9,7 +9,7 @@ import javax.persistence.Id;
 @Data
 public class DataStock {
     @Id
-    @Field(name = "_id")
+    //@Field(name = "_id")
     private String id;
     @Field(name = "id_auto")
     private String idAuto;

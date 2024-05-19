@@ -7,7 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Document(collection = "Work")
@@ -27,6 +29,8 @@ public class Work {
     private String scriptName;
     @Field(name = "id_custom")
     private String idCustom;
+    @Field(name = "id_auto")
+    private String idAuto;
     private String income;
     private String spending;
     private String data;
@@ -34,4 +38,8 @@ public class Work {
     private Date createdAt;
     @Field(name = "created_by")
     private String createdBy;
+    private String assignee;
+
+    @Transient
+    private List<String>idStocks;
 }

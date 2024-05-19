@@ -5,6 +5,7 @@ import com.example.marketing.model.entities.User;
 import com.example.marketing.repository.UserRepository;
 import com.example.marketing.repository.WalletRepository;
 import com.example.marketing.util.Constant;
+import com.example.marketing.util.RoleName;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,18 @@ public class AccountService {
         Page<UserDTO> userPage = userRepository.findAllByDepartmentIdOrderByCreatedAtDesc
                 (departmentId, PageRequest.of(pageNum, pageSize));
         return userPage;
+    }
+
+    public String deleteUser(long id, UserDTO dto){
+        if(!dto.isAdmin() && !RoleName.LEADER.name().equalsIgnoreCase(dto.getRole())){
+            return Constant.MESSAGE_ER.PERMISSION_DENIED;
+        }
+        User user = userRepository.findByIdAndAdminFalse(id);
+        if(user == null){
+            return Constant.ACCOUNT_NOT_EXISTED;
+        }
+        userRepository.delete(user);
+        return Constant.STATUS_SUCCESS;
     }
 
 }

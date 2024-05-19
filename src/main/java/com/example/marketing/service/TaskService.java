@@ -160,4 +160,13 @@ public class TaskService {
         }
         return null;
     }
+
+    public String deleteTask(long id){
+        Task task = taskRepository.findById(id).orElse(null);
+        if(task == null){
+            return Constant.TASK_NOT_EXISTED;
+        }
+        taskRepository.delete(task);
+        return Constant.STATUS_SUCCESS;
+    }
 }

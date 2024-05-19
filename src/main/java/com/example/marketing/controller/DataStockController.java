@@ -14,6 +14,7 @@ import com.example.marketing.service.TypeIdInfoService;
 import com.example.marketing.service.TypeIdService;
 import com.example.marketing.util.Constant;
 import com.example.marketing.util.JWTUtil;
+import com.example.marketing.util.RoleName;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -80,7 +82,22 @@ public class DataStockController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
 
-        String response = dataStockService.modify(body);
+        String response = dataStockService.modify(body, userDTO.getUsername());
+        if(Constant.STATUS_SUCCESS.equals(response))
+            return ResponseEntity.ok("Thao tác thành công");
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.DELETE)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteDataStock (@RequestHeader(name="Authorization") String token,
+                                            @PathVariable String id){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+
+        String response = dataStockService.deleteDtStock(id, userDTO);
         if(Constant.STATUS_SUCCESS.equals(response))
             return ResponseEntity.ok("Thao tác thành công");
         return ResponseEntity.badRequest().body(response);
@@ -118,6 +135,22 @@ public class DataStockController {
         return ResponseEntity.ok().body(page.getContent());
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.DELETE)
+    @DeleteMapping("/type-id/{id}")
+    public ResponseEntity<?> deleteTypeId (@RequestHeader(name="Authorization") String token,
+                                         @PathVariable long id){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+        if(!userDTO.isAdmin() && !"leader".equalsIgnoreCase(userDTO.getRole()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new DataResponse<>(HttpStatus.FORBIDDEN.value(), "Bạn không có quyền thao tác"));
+        String response = typeIdService.delete(id);
+        if(!response.equals(Constant.STATUS_SUCCESS))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new DataResponse<>(response));
+        return ResponseEntity.ok(new DataResponse<>(Constant.MESSAGE_ERR.get(response)));
+    }
+
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.POST)
     @PostMapping("/type-id/info")
     public ResponseEntity<?> modifyTypeIdInfo (@RequestHeader(name="Authorization") String token,
@@ -138,7 +171,7 @@ public class DataStockController {
     public ResponseEntity<?> deleteTypeIdInfo (@RequestHeader(name="Authorization") String token,
                                          @RequestParam long id){
         UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
-        if(userDTO == null){
+        if(userDTO == null || (!userDTO.isAdmin() && !RoleName.LEADER.name().equalsIgnoreCase(userDTO.getRole()))){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
         String result = typeIdInfoService.deleteTypeIdInfo(id);

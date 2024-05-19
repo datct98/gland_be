@@ -16,8 +16,10 @@ public class DataConnection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    // workId
     @Column(name = "id_from")
     private String idFrom;
+    // scriptId
     @Column(name = "id_to")
     private long idTo;
     private Boolean connected;

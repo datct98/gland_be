@@ -1,11 +1,13 @@
 package com.example.marketing.service;
 
+import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.ConfigSystem;
 import com.example.marketing.model.entities.stock.DataStock;
 import com.example.marketing.model.response.DataResponse;
 import com.example.marketing.repository.ConfigSystemRepository;
 import com.example.marketing.repository.DataStockRepository;
 import com.example.marketing.util.Constant;
+import com.example.marketing.util.RoleName;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,7 @@ public class DataStockService {
     @Autowired
     private ConfigSystemRepository configSystemRepository;
 
-    public String modify(DataStock body){
+    public String modify(DataStock body, String createBy){
         DataStock stock = dataStockRepository.findById(body.getId()).orElse(null);
         if(stock ==null){
             if(StringUtils.isNotEmpty(body.getIdCustom())){
@@ -31,6 +33,7 @@ public class DataStockService {
                 }
             }
             stock = new DataStock();
+            stock.setCreatedBy(createBy);
         } else {
             // Check trong trường hợp người dùng muốn chỉnh sửa Id
             if(StringUtils.isNotEmpty(body.getIdCustom()) && !body.getIdCustom().equals(stock.getIdCustom())){
@@ -60,6 +63,19 @@ public class DataStockService {
         stock.setPreCode(body.getPreCode());
         stock.setData(body.getData());
         dataStockRepository.save(stock);
+        return Constant.STATUS_SUCCESS;
+    }
+
+    public String deleteDtStock(String id, UserDTO dto){
+        DataStock stock = dataStockRepository.findById(id).orElse(null);
+        if(stock == null){
+            return "Không tìm thấy Data stock id:"+id;
+        }
+        if(!dto.isAdmin() && !RoleName.LEADER.name().equalsIgnoreCase(dto.getRole())
+                && !dto.getUsername().equals(stock.getCreatedBy())){
+            return "User doesnt have permission";
+        }
+        dataStockRepository.delete(stock);
         return Constant.STATUS_SUCCESS;
     }
 }
