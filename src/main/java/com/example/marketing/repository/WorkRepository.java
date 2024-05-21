@@ -13,6 +13,8 @@ public interface WorkRepository extends MongoRepository<Work, String> {
     Page<Work> findAllByTaskIdAndCreatedByOrderByCreatedAtDesc(long taskId, String createdBy, Pageable pageable);
     Page<Work> findAllByTaskIdAndIdIn(long taskId, List<String> ids, Pageable pageable);
     List<Work> findAllByIdWork(String idWork);
-
+    List<Work> findAllByTaskId(long taskId);
+    List<Work> findAllByTaskIdIn(List<Long> taskIds);
     Work findByIdWork(String idWork);
+    Work findByIdCustomIsOrIdAutoIs(String idCustom, String idAuto);
 }

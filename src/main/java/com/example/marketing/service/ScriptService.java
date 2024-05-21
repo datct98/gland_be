@@ -7,9 +7,15 @@ import com.example.marketing.model.entities.Department;
 import com.example.marketing.model.entities.Script;
 import com.example.marketing.model.entities.User;
 import com.example.marketing.model.entities.Work;
+import com.example.marketing.model.entities.script_setting.Task;
+import com.example.marketing.model.entities.script_setting.TaskInfo;
+import com.example.marketing.model.entities.script_setting.TaskStatus;
 import com.example.marketing.repository.DataConnectRepository;
 import com.example.marketing.repository.DepartmentRepository;
 import com.example.marketing.repository.ScriptRepository;
+import com.example.marketing.repository.TaskInfoRepository;
+import com.example.marketing.repository.TaskRepository;
+import com.example.marketing.repository.TaskStatusRepository;
 import com.example.marketing.repository.UserRepository;
 import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.util.Constant;
@@ -36,6 +42,12 @@ public class ScriptService {
     private WorkRepository workRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private TaskInfoRepository taskInfoRepository;
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
 
     public String modifyScript(Script body, String createdBy){
         try {
@@ -90,9 +102,29 @@ public class ScriptService {
             return Constant.SCRIPT_NOT_EXISTED;
         else {
             try {
-                if(!isAdmin || script.getDepartmentId()!= departmentId){
+                if(!isAdmin && script.getDepartmentId()!= departmentId){
                     log.error("User doesnt have permission to delete script id: "+id);
                     return Constant.SYS_ERR;
+                }
+                List<Task> tasks = taskRepository.findAllByScriptId(id);
+                if(tasks.size()>0){
+                    List<Long> idTasks = tasks.stream().map(Task::getId).collect(Collectors.toList());
+                    List<Work> works = workRepository.findAllByTaskIdIn(idTasks);
+                    log.info("#deleteById works size: "+works.size());
+                    if(works.size()>0){
+                        workRepository.deleteAll(works);
+                    }
+                    List<TaskInfo> taskInfos = taskInfoRepository.findAllByTaskIdIn(idTasks);
+                    log.info("#deleteById taskInfos size: "+taskInfos.size());
+                    if(taskInfos.size()>0){
+                        taskInfoRepository.deleteAll(taskInfos);
+                    }
+                    List<TaskStatus> taskStatuses = taskStatusRepository.findAllByTaskIdIn(idTasks);
+                    log.info("#deleteById taskStatuses size: "+taskStatuses.size());
+                    if(taskStatuses.size()>0){
+                        taskStatusRepository.deleteAll(taskStatuses);
+                    }
+                    taskRepository.deleteAll(tasks);
                 }
                 scriptRepository.delete(script);
                 log.info("deleteById - delete script with id: {} successfully", id);

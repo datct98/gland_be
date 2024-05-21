@@ -14,4 +14,6 @@ public interface DataStockRepository extends MongoRepository<DataStock, String> 
 
     Page<DataStock> findAll(Pageable pageable);
     List<DataStock> findByIdCustom(String idCustom);
+
+    DataStock findByIdCustomIsOrIdAutoIs(String id, String id2);
 }

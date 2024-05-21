@@ -40,6 +40,12 @@ public class Work {
     private String createdBy;
     private String assignee;
 
-    @Transient
-    private List<String>idStocks;
+    private List<Stock>idStocks;
+}
+@Data
+class Stock{
+    long typeId;
+    String typeName;
+    //idCustom or idAuto
+    String idDataStock;
 }

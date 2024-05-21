@@ -2,13 +2,17 @@ package com.example.marketing.service;
 
 import com.example.marketing.model.dto.RoleScriptDTO;
 import com.example.marketing.model.dto.TaskScriptDTO;
+import com.example.marketing.model.entities.Work;
 import com.example.marketing.model.entities.script_setting.Task;
 import com.example.marketing.model.entities.script_setting.TaskInfo;
 import com.example.marketing.model.entities.script_setting.TaskScriptConfig;
+import com.example.marketing.model.entities.script_setting.TaskStatus;
 import com.example.marketing.model.entities.stock.TypeIdInfo;
 import com.example.marketing.repository.TaskInfoRepository;
 import com.example.marketing.repository.TaskRepository;
 import com.example.marketing.repository.TaskScriptConfigRepository;
+import com.example.marketing.repository.TaskStatusRepository;
+import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.util.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +34,10 @@ public class TaskService {
     private TaskScriptConfigRepository taskScriptConfigRepository;
     @Autowired
     private TaskInfoRepository taskInfoRepository;
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
+    @Autowired
+    private WorkRepository workRepository;
 
     public String modifyTask(TaskScriptDTO body){
         try{
@@ -63,6 +71,19 @@ public class TaskService {
                 //Set data for task Id
                 List<TaskInfo> infos = body.getInfos();
                 List<TaskInfo> infoNews = new ArrayList<>();
+                // Default have Id column
+                TaskInfo taskInfo = new TaskInfo();
+                taskInfo.setTaskId(task.getId());
+                taskInfo.setField("Id");
+                taskInfo.setDataType("text");
+                taskInfo.setStatus(true);
+                if("idAuto".equalsIgnoreCase(task.getTypeId())){
+                    taskInfo.setIdAuto(true);
+                } else {
+                    taskInfo.setIdCustom(true);
+                }
+                infoNews.add(taskInfo);
+
                 for(TaskInfo info: infos){
                     TaskInfo infoNew;
                     if(info.getId() == null || info.getId() == 0){
@@ -165,6 +186,19 @@ public class TaskService {
         Task task = taskRepository.findById(id).orElse(null);
         if(task == null){
             return Constant.TASK_NOT_EXISTED;
+        }
+        List<Work> works = workRepository.findAllByTaskId(id);
+        if(works.size()>0)
+            workRepository.deleteAll(works);
+        List<TaskInfo> taskInfos = taskInfoRepository.findAllByTaskId(id);
+        log.info("#deleteById taskInfos size: "+taskInfos.size());
+        if(taskInfos.size()>0){
+            taskInfoRepository.deleteAll(taskInfos);
+        }
+        List<TaskStatus> taskStatuses = taskStatusRepository.findAllByTaskId(id);
+        log.info("#deleteById taskStatuses size: "+taskStatuses.size());
+        if(taskStatuses.size()>0){
+            taskStatusRepository.deleteAll(taskStatuses);
         }
         taskRepository.delete(task);
         return Constant.STATUS_SUCCESS;

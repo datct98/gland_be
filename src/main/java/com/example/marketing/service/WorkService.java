@@ -3,10 +3,13 @@ package com.example.marketing.service;
 import com.example.marketing.model.entities.ConfigSystem;
 import com.example.marketing.model.entities.DataConnection;
 import com.example.marketing.model.entities.Work;
+import com.example.marketing.model.entities.script_setting.Task;
+import com.example.marketing.model.entities.script_setting.TaskInfo;
 import com.example.marketing.repository.ConfigSystemRepository;
 import com.example.marketing.repository.DataConnectRepository;
 import com.example.marketing.repository.DataStockRepository;
 import com.example.marketing.repository.TaskInfoRepository;
+import com.example.marketing.repository.TaskRepository;
 import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.util.Constant;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +21,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,9 +38,9 @@ public class WorkService {
     @Autowired
     private DataConnectRepository dataConnectRepository;
     @Autowired
-    private TaskInfoRepository taskInfoRepository;
+    private TaskRepository taskRepository;
     @Autowired
-    private DataStockRepository dataStockRepository;
+    private TaskInfoRepository taskInfoRepository;
 
 
     public String modifyWork(Work body, String createdBy){
@@ -47,6 +53,8 @@ public class WorkService {
                     log.error("#createWork khong tim thay Work id ={}", body.getId());
                     return Constant.WORK_NOT_EXISTED;
                 }
+
+                work.setIdStocks(body.getIdStocks());
                 work.setData(body.getData());
                 workRepository.save(work);
             } else {
@@ -62,14 +70,46 @@ public class WorkService {
                 work.setDepartmentName(body.getDepartmentName());
                 work.setScriptId(body.getScriptId());
                 work.setScriptName(body.getScriptName());
+                work.setIdStocks(body.getIdStocks());
 
-                ConfigSystem config = configSystemRepository.findById(1L).orElse(null);
-                if(config == null){
-                    log.error("#modifyWork ConfigSystem is not found");
-                    return Constant.CONFIG_SYSTEM_NOT_EXISTED;
+                Task task = taskRepository.findById(work.getTaskId()).orElse(null);
+                if(task == null){
+                    log.error("#modifyWork task is not found id: "+work.getTaskId());
+                    return Constant.TASK_NOT_EXISTED;
                 }
-                ObjectMapper objectMapper = new ObjectMapper();
-                work.setIdCustom(body.getIdCustom());
+                if("idAuto".equalsIgnoreCase(task.getTypeId())){
+                    ConfigSystem config = configSystemRepository.findById(1L).orElse(null);
+                    if(config == null){
+                        log.error("#modifyWork ConfigSystem is not found");
+                        return Constant.CONFIG_SYSTEM_NOT_EXISTED;
+                    }
+                    work.setIdAuto(task.getPreCode()+config.getIdWorkAuto());
+                    config.setIdWorkAuto(config.getIdWorkAuto()+1);
+                    configSystemRepository.save(config);
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    //Vì client k nhập đk idAuto nên cần lưu lại trong data field
+                    if(StringUtils.isNotEmpty(body.getData())){
+                        log.info("#modifyWork edit data field of work");
+                        Map<String, String> map = objectMapper.readValue(body.getData(), HashMap.class);
+                        Set<String> keys = map.keySet();
+                        List<Long> ids = keys.stream().map(Long::parseLong).collect(Collectors.toList());
+                        List<TaskInfo> infos = taskInfoRepository.findAllByIdIn(ids);
+                        for (TaskInfo info: infos){
+                            if(info.getIdAuto()){
+                                map.put(info.getId()+"", work.getIdAuto());
+                                break;
+                            }
+                        }
+                        work.setData(objectMapper.writeValueAsString(map));
+                    }
+                } else {
+                    Work workCheck = workRepository.findByIdCustomIsOrIdAutoIs(body.getIdCustom(), body.getIdCustom());
+                    if(workCheck != null){
+                        log.error("#modifyWork id input: "+ body.getIdCustom()+" existed");
+                        return Constant.ID_CUSTOM_EXISTED;
+                    }
+                    work.setIdCustom(body.getIdCustom());
+                }
                 work.setIncome(body.getIncome());
                 work.setSpending(body.getSpending());
                 workRepository.save(work);

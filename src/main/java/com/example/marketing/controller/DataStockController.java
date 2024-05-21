@@ -88,6 +88,23 @@ public class DataStockController {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getDetailDataStock (@RequestHeader(name="Authorization") String token,
+                                              @PathVariable String id){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+
+        DataStock stock = dataStockRepository.findByIdCustomIsOrIdAutoIs(id, id);
+        if(stock == null){
+            return ResponseEntity.badRequest().body("Không tìm thấy Data stock id:"+id) ;
+        }
+
+        return ResponseEntity.ok().body(stock);
+    }
+
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDataStock (@RequestHeader(name="Authorization") String token,
