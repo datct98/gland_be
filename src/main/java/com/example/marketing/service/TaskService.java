@@ -38,6 +38,8 @@ public class TaskService {
     private TaskStatusRepository taskStatusRepository;
     @Autowired
     private WorkRepository workRepository;
+    @Autowired
+    private TaskScriptConfigService taskScriptConfigService;
 
     public String modifyTask(TaskScriptDTO body){
         try{
@@ -57,6 +59,9 @@ public class TaskService {
                         body.getHourDefault(): task.getHourDefault());
                 task.setName(StringUtils.isNotEmpty(body.getNameTask())? body.getNameTask(): task.getName());
                 task.setTypeId(body.getIdAuto()? "idAuto": "idCustom");
+                if("idCustom".equalsIgnoreCase(task.getTypeId())){
+                    body.setPreCode(null);
+                }
                 if(StringUtils.isNotEmpty(body.getPreCode()) && body.getIdAuto()){
                     List<Task> tasks = taskRepository.findAllByPreCode(body.getPreCode());
                     if(tasks.size()>0){
@@ -64,25 +69,26 @@ public class TaskService {
                     }
                     task.setPreCode(body.getPreCode());
                 }
-                if(!body.getIdAuto()){
-                    task.setPreCode(null);
-                }
 
                 //Set data for task Id
                 List<TaskInfo> infos = body.getInfos();
                 List<TaskInfo> infoNews = new ArrayList<>();
-                // Default have Id column
-                TaskInfo taskInfo = new TaskInfo();
-                taskInfo.setTaskId(task.getId());
-                taskInfo.setField("Id");
-                taskInfo.setDataType("text");
-                taskInfo.setStatus(true);
-                if("idAuto".equalsIgnoreCase(task.getTypeId())){
-                    taskInfo.setIdAuto(true);
-                } else {
-                    taskInfo.setIdCustom(true);
+                if(infos.size() ==0 ){
+                    // Default have Id column
+                    TaskInfo taskInfo = new TaskInfo();
+                    taskInfo.setTaskId(task.getId());
+                    taskInfo.setField("Id");
+                    taskInfo.setDataType("text");
+                    taskInfo.setStatus(true);
+
+                    if("idAuto".equalsIgnoreCase(task.getTypeId())){
+                        taskInfo.setIdAuto(true);
+                    } else {
+                        taskInfo.setIdCustom(true);
+                        taskInfo.setPreCode(null);
+                    }
+                    infoNews.add(taskInfo);
                 }
-                infoNews.add(taskInfo);
 
                 for(TaskInfo info: infos){
                     TaskInfo infoNew;
@@ -200,6 +206,7 @@ public class TaskService {
         if(taskStatuses.size()>0){
             taskStatusRepository.deleteAll(taskStatuses);
         }
+        taskScriptConfigService.deleteConfig(List.of(task.getId()), new ArrayList<>());
         taskRepository.delete(task);
         return Constant.STATUS_SUCCESS;
     }

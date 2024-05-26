@@ -1,17 +1,23 @@
 package com.example.marketing.service;
 
+import com.example.marketing.model.entities.stock.DataStock;
 import com.example.marketing.model.entities.stock.TypeId;
+import com.example.marketing.repository.DataStockRepository;
 import com.example.marketing.repository.TypeIdRepository;
 import com.example.marketing.util.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class TypeIdService {
     @Autowired
     private TypeIdRepository typeIdRepository;
+    @Autowired
+    private DataStockRepository dataStockRepository;
 
     public String modify(TypeId body){
         TypeId typeId;
@@ -37,6 +43,8 @@ public class TypeIdService {
             log.error("#TypeIdService delete - cant find id: "+id);
             return Constant.MESSAGE_ER.TYPE_ID_NULL;
         }
+        List<DataStock> dataStocks = dataStockRepository.findAllByTypeId(id);
+        dataStockRepository.deleteAll(dataStocks);
         typeIdRepository.delete(typeId);
         return Constant.STATUS_SUCCESS;
     }

@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface DataStockRepository extends MongoRepository<DataStock, String> {
     Page<DataStock> findAllByTypeId(Long typeId, Pageable pageable);
-
+    List<DataStock> findAllByTypeId(long typeId);
     Page<DataStock> findAll(Pageable pageable);
     List<DataStock> findByIdCustom(String idCustom);
 

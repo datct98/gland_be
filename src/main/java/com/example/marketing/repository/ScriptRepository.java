@@ -12,7 +12,10 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ScriptRepository extends JpaRepository<Script, Long> {
-    Page<Script> findAllByDepartmentIdAndStatusOrderByCreatedAtDesc(long departmentId, boolean status, Pageable pageable);
+    @Query("select s from Script s where (:departmentId is null or s.departmentId =:departmentId) " +
+            "AND s.status =:status " +
+            "order by s.createdAt desc")
+    Page<Script> findAllByDepartmentIdAndStatusOrderByCreatedAtDesc(Long departmentId, boolean status, Pageable pageable);
 
     //List<Script> findAllByDepartmentIdAndStatusOrderByCreatedAtDesc(long departmentId, boolean status);
 
@@ -28,6 +31,8 @@ public interface ScriptRepository extends JpaRepository<Script, Long> {
     List<ScriptConnectDTO> findOtherScripts(long scriptId);
 
     @Query("select new com.example.marketing.model.dto.ScriptConnectDTO(s.id, s.name) from Script s  " +
-            "where s.departmentId =:departmentId ")
-    List<ScriptConnectDTO> findScriptsByDepartmentId(long departmentId);
+            "where s.departmentId =:departmentId and s.id is not :scriptId")
+    List<ScriptConnectDTO> findScriptsByDepartmentId(long departmentId, long scriptId);
+
+    List<Script> findAllByDepartmentId(long departmentId);
 }

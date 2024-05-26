@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface TaskScriptConfigRepository extends JpaRepository<TaskScriptConfig, Long> {
     List<TaskScriptConfig> findAllByTaskIdAndScriptIdIn(Long taskId, List<Long> scriptIds);
+    List<TaskScriptConfig> findAllByTaskIdInOrScriptIdIn(List<Long> taskIds, List<Long> scriptIds);
 }

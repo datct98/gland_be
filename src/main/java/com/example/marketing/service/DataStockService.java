@@ -23,6 +23,9 @@ public class DataStockService {
     private ConfigSystemRepository configSystemRepository;
 
     public String modify(DataStock body, String createBy){
+        if(StringUtils.isNotEmpty(body.getIdCustom())){
+            body.setPreCode(null);
+        }
         DataStock stock = dataStockRepository.findById(body.getId()).orElse(null);
         if(stock ==null){
             if(StringUtils.isNotEmpty(body.getIdCustom())){

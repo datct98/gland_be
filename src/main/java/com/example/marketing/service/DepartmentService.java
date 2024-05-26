@@ -5,7 +5,16 @@ import com.example.marketing.model.dto.DepartmentScriptDTO;
 import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.Department;
 import com.example.marketing.model.entities.Script;
+import com.example.marketing.model.entities.Work;
+import com.example.marketing.model.entities.script_setting.Task;
+import com.example.marketing.model.entities.script_setting.TaskInfo;
+import com.example.marketing.model.entities.script_setting.TaskStatus;
 import com.example.marketing.repository.DepartmentRepository;
+import com.example.marketing.repository.ScriptRepository;
+import com.example.marketing.repository.TaskInfoRepository;
+import com.example.marketing.repository.TaskRepository;
+import com.example.marketing.repository.TaskStatusRepository;
+import com.example.marketing.repository.WorkRepository;
 import com.example.marketing.util.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +33,20 @@ import java.util.stream.Collectors;
 public class DepartmentService {
     @Autowired
     private DepartmentRepository departmentRepository;
+    @Autowired
+    private WorkRepository workRepository;
+    @Autowired
+    private ScriptRepository scriptRepository;
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private TaskInfoRepository taskInfoRepository;
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
+    @Autowired
+    private DataConnectService dataConnectService;
+    @Autowired
+    private TaskScriptConfigService taskScriptConfigService;
 
     public void modifyDepartmentService(Department body, String username){
         // Tồn tại thì update
@@ -101,6 +124,32 @@ public class DepartmentService {
             return Constant.DEPARTMENT_NOT_EXISTED;
         }
         try {
+            List<Script> scripts = scriptRepository.findAllByDepartmentId(id);
+            if(scripts.size()>0){
+                List<Long> idScripts = scripts.stream().map(Script::getId).collect(Collectors.toList());
+                List<Task> tasks = taskRepository.findAllByScriptIdIn(idScripts);
+                if(tasks.size()> 0 ){
+                    List<Long> idTasks = tasks.stream().map(Task::getId).collect(Collectors.toList());
+                    List<TaskInfo> infos = taskInfoRepository.findAllByTaskIdIn(idTasks);
+                    if(infos.size()>0){
+                        taskInfoRepository.deleteAll(infos);
+                    }
+                    List<TaskStatus> taskStatuses = taskStatusRepository.findAllByTaskIdIn(idTasks);
+                    if(taskStatuses.size()>0){
+                        taskStatusRepository.deleteAll(taskStatuses);
+                    }
+                    List<Work> works = workRepository.findAllByTaskIdIn(idTasks);
+                    if(works.size()>0){
+                        List<String>idWorks = works.stream().map(Work::getId).collect(Collectors.toList());
+                        log.info("#deleteById works size: "+works.size());
+                        dataConnectService.deleteData(idWorks, idScripts);
+                        workRepository.deleteAll(works);
+                    }
+                    taskScriptConfigService.deleteConfig(idTasks, idScripts);
+                    taskRepository.deleteAll(tasks);
+                }
+                scriptRepository.deleteAll(scripts);
+            }
             departmentRepository.delete(department);
             return Constant.STATUS_SUCCESS;
         } catch (Exception e){

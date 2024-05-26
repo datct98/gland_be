@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,10 @@ public class ScriptService {
     private TaskInfoRepository taskInfoRepository;
     @Autowired
     private TaskStatusRepository taskStatusRepository;
+    @Autowired
+    private DataConnectService dataConnectService;
+    @Autowired
+    private TaskScriptConfigService taskScriptConfigService;
 
     public String modifyScript(Script body, String createdBy){
         try {
@@ -110,7 +115,9 @@ public class ScriptService {
                 if(tasks.size()>0){
                     List<Long> idTasks = tasks.stream().map(Task::getId).collect(Collectors.toList());
                     List<Work> works = workRepository.findAllByTaskIdIn(idTasks);
+                    List<String>idWorks = works.stream().map(Work::getId).collect(Collectors.toList());
                     log.info("#deleteById works size: "+works.size());
+                    dataConnectService.deleteData(idWorks, new ArrayList<>(List.of(id)));
                     if(works.size()>0){
                         workRepository.deleteAll(works);
                     }
@@ -124,6 +131,7 @@ public class ScriptService {
                     if(taskStatuses.size()>0){
                         taskStatusRepository.deleteAll(taskStatuses);
                     }
+                    taskScriptConfigService.deleteConfig(idTasks, List.of(id));
                     taskRepository.deleteAll(tasks);
                 }
                 scriptRepository.delete(script);

@@ -10,4 +10,5 @@ public interface DataConnectRepository extends JpaRepository<DataConnection, Lon
     List<DataConnection> findAllByIdFrom(String idFrom);
     List<DataConnection> findAllByIdFromAndIdTo(String idFrom, Long idTo);
     List<DataConnection> findAllByIdToAndConnected(long idTo, boolean connected);
+    List<DataConnection> findAllByIdFromInOrIdToIn(List<String> idWorks, List<Long> idScripts);
 }
