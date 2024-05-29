@@ -47,6 +47,8 @@ public class DepartmentService {
     private DataConnectService dataConnectService;
     @Autowired
     private TaskScriptConfigService taskScriptConfigService;
+    @Autowired
+    private TypeIdService typeIdService;
 
     public void modifyDepartmentService(Department body, String username){
         // Tồn tại thì update
@@ -150,6 +152,8 @@ public class DepartmentService {
                 }
                 scriptRepository.deleteAll(scripts);
             }
+            // delete kho dữ liệu
+            typeIdService.deleteTypeId(id);
             departmentRepository.delete(department);
             return Constant.STATUS_SUCCESS;
         } catch (Exception e){

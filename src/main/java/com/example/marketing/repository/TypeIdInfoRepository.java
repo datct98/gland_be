@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface TypeIdInfoRepository extends JpaRepository<TypeIdInfo, Long> {
     List<TypeIdInfo> findAllByTypeId(long typeId);
+
+    List<TypeIdInfo> findAllByTypeIdIn(List<Long> typeIds);
 }

@@ -14,6 +14,6 @@ public interface DataStockRepository extends MongoRepository<DataStock, String> 
     List<DataStock> findAllByTypeId(long typeId);
     Page<DataStock> findAll(Pageable pageable);
     List<DataStock> findByIdCustom(String idCustom);
-
+    List<DataStock> findAllByTypeIdIn(List<Long> typeIds);
     DataStock findByIdCustomIsOrIdAutoIs(String id, String id2);
 }

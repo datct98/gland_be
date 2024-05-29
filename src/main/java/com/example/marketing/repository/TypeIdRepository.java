@@ -13,4 +13,5 @@ public interface TypeIdRepository extends JpaRepository<TypeId, Long> {
     Page<TypeId> findAllByDepartmentId(Long departmentId, Pageable pageable);
 
     List<TypeId> findAllByPreCode(String preCode);
+    List<TypeId> findAllByDepartmentId(Long departmentId);
 }

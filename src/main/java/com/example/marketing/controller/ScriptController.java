@@ -72,12 +72,12 @@ public class ScriptController {
     public ResponseEntity<?> getScripts(@RequestHeader(name="Authorization") String token,
                                         @RequestParam(required = false) Integer pageNum,
                                         @RequestParam(required = false) Integer pageSize,
-                                        @RequestParam Long departmentId){
+                                        @RequestParam(required = false) Long departmentId){
         UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
         if(userDTO == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
-        Page<Script> scriptPage = scriptService.getScripts(departmentId, PageRequest.of(pageNum, pageSize));
+        Page<ScriptConnectDTO> scriptPage = scriptService.getScripts(departmentId, PageRequest.of(pageNum, pageSize));
         return ResponseEntity.ok(new DataResponse<>(scriptPage.getContent(), scriptPage.getTotalPages()));
     }
 

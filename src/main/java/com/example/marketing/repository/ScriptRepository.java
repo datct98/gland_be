@@ -12,10 +12,12 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ScriptRepository extends JpaRepository<Script, Long> {
-    @Query("select s from Script s where (:departmentId is null or s.departmentId =:departmentId) " +
+    @Query("select new com.example.marketing.model.dto.ScriptConnectDTO(s.id, s.name, d.name, d.id, s.createdAt) from Script s " +
+            "join Department d on s.departmentId = d.id " +
+            " where (:departmentId is null or s.departmentId =:departmentId) " +
             "AND s.status =:status " +
             "order by s.createdAt desc")
-    Page<Script> findAllByDepartmentIdAndStatusOrderByCreatedAtDesc(Long departmentId, boolean status, Pageable pageable);
+    Page<ScriptConnectDTO> findAllByDepartmentIdAndStatusOrderByCreatedAtDesc(Long departmentId, boolean status, Pageable pageable);
 
     //List<Script> findAllByDepartmentIdAndStatusOrderByCreatedAtDesc(long departmentId, boolean status);
 

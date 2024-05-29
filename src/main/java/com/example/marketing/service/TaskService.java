@@ -61,19 +61,22 @@ public class TaskService {
                 task.setTypeId(body.getIdAuto()? "idAuto": "idCustom");
                 if("idCustom".equalsIgnoreCase(task.getTypeId())){
                     body.setPreCode(null);
+                    task.setPreCode(null);
                 }
                 if(StringUtils.isNotEmpty(body.getPreCode()) && body.getIdAuto()){
-                    List<Task> tasks = taskRepository.findAllByPreCode(body.getPreCode());
-                    if(tasks.size()>0){
-                        return "Từ viết tắt đã tồn tại";
+                    if(!body.getPreCode().equalsIgnoreCase(task.getPreCode())){
+                        List<Task> tasks = taskRepository.findAllByPreCode(body.getPreCode());
+                        if(tasks.size()>0){
+                            return "Từ viết tắt đã tồn tại";
+                        }
                     }
                     task.setPreCode(body.getPreCode());
                 }
 
                 //Set data for task Id
-                List<TaskInfo> infos = body.getInfos();
+                List<TaskInfo> infosExisted = taskInfoRepository.findAllByTaskId(task.getId());
                 List<TaskInfo> infoNews = new ArrayList<>();
-                if(infos.size() ==0 ){
+                if(infosExisted.size() ==0 ){
                     // Default have Id column
                     TaskInfo taskInfo = new TaskInfo();
                     taskInfo.setTaskId(task.getId());
@@ -83,13 +86,33 @@ public class TaskService {
 
                     if("idAuto".equalsIgnoreCase(task.getTypeId())){
                         taskInfo.setIdAuto(true);
+                        taskInfo.setIdCustom(false);
+                        taskInfo.setPreCode(body.getPreCode());
                     } else {
+                        taskInfo.setIdAuto(false);
                         taskInfo.setIdCustom(true);
                         taskInfo.setPreCode(null);
                     }
                     infoNews.add(taskInfo);
+                } else {
+                    for (TaskInfo info: infosExisted){
+                        // update riêng cho cột Id
+                        if("Id".equalsIgnoreCase(info.getField())){
+                            if("idAuto".equalsIgnoreCase(task.getTypeId())){
+                                info.setIdAuto(true);
+                                info.setIdCustom(false);
+                                info.setPreCode(body.getPreCode());
+                            } else {
+                                info.setIdAuto(false);
+                                info.setIdCustom(true);
+                                info.setPreCode(null);
+                            }
+                            taskInfoRepository.save(info);
+                            break;
+                        }
+                    }
                 }
-
+                List<TaskInfo> infos = body.getInfos();
                 for(TaskInfo info: infos){
                     TaskInfo infoNew;
                     if(info.getId() == null || info.getId() == 0){

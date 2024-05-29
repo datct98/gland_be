@@ -95,7 +95,7 @@ public class WorkService {
                         List<Long> ids = keys.stream().map(Long::parseLong).collect(Collectors.toList());
                         List<TaskInfo> infos = taskInfoRepository.findAllByIdIn(ids);
                         for (TaskInfo info: infos){
-                            if(info.getIdAuto()){
+                            if(info.getIdAuto()!= null && info.getIdAuto()){
                                 map.put(info.getId()+"", work.getIdAuto());
                                 break;
                             }

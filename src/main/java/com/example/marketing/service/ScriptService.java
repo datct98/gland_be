@@ -79,8 +79,8 @@ public class ScriptService {
 
     }
 
-    public Page<Script> getScripts(long departmentId, Pageable pageable){
-        Page<Script> scripts = scriptRepository.findAllByDepartmentIdAndStatusOrderByCreatedAtDesc(departmentId, true, pageable);
+    public Page<ScriptConnectDTO> getScripts(Long departmentId, Pageable pageable){
+        Page<ScriptConnectDTO> scripts = scriptRepository.findAllByDepartmentIdAndStatusOrderByCreatedAtDesc(departmentId, true, pageable);
         return scripts;
     }
 

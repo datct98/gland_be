@@ -34,4 +34,13 @@ public class TaskStatusService {
         taskStatusRepository.save(taskStatus);
         return Constant.STATUS_SUCCESS;
     }
+
+    public String delete(long id){
+        TaskStatus taskStatus = taskStatusRepository.findById(id).orElse(null);
+        if(taskStatus == null){
+            return Constant.TASK_NOT_EXISTED;
+        }
+        taskStatusRepository.delete(taskStatus);
+        return Constant.STATUS_SUCCESS;
+    }
 }
