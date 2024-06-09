@@ -53,7 +53,9 @@ public class AccountService {
         if(user == null){
             return Constant.ACCOUNT_NOT_EXISTED;
         }
-        user.setPassword(passwordEncoder.encode(body.getPassword()));
+        if(StringUtils.isNotEmpty(body.getPassword())){
+            user.setPassword(passwordEncoder.encode(body.getPassword()));
+        }
         user.setDepartmentId(body.getDepartmentId());
         user.setEmail(body.getEmail());
         if(StringUtils.isEmpty(body.getRole())){

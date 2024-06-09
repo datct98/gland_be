@@ -164,11 +164,13 @@ public class ScriptService {
             if(work == null){
                 return "Không tìm thấy work id:"+body.getIdFrom();
             }
+            work.setStatus("Assigned");
             List<UserDTO> users = userRepository.findAllByRoleAndDepartmentId("leader",work.getDepartmentId());
             if(users.size() >0){
                 work.setAssignee(users.get(0).getUsername());
-                works.add(work);
+                //work.setStatus("Assigned");
             }
+            works.add(work);
             connections.add(connection);
         }
         dataConnectRepository.saveAll(connections);

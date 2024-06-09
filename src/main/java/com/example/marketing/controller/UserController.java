@@ -90,7 +90,7 @@ public class UserController {
             // Trả về jwt cho người dùng.
             String jwt = jwtUtil.generateToken(detail);
             User user = detail.getUser();
-            return ResponseEntity.ok(new LoginResponse(user.isAdmin(), jwt, user.getRole()));
+            return ResponseEntity.ok(new LoginResponse(user.isAdmin(), jwt, user.getRole(), user.getId()));
 
         } catch (Exception e){
             log.error(e.getMessage());

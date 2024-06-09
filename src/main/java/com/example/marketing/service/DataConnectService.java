@@ -24,6 +24,17 @@ public class DataConnectService {
         } catch (Exception e){
             log.error("#DataConnectService - deleteData fail: "+e.getMessage());
         }
+    }
 
+    public void unConnected(String idFrom, long idTo){
+        List<DataConnection> connections = dataConnectRepository.findAllByIdFromAndIdTo(idFrom, idTo);
+        if(connections.size() == 0){
+            log.error("Không tìm thấy công việc: "+idFrom+" - và kịch bản: "+idTo);
+        } else {
+            connections.forEach(e ->{
+                e.setConnected(false);
+            });
+        }
+        dataConnectRepository.saveAll(connections);
     }
 }

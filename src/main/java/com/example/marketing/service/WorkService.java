@@ -1,5 +1,6 @@
 package com.example.marketing.service;
 
+import com.example.marketing.model.dto.ActionWorkDTO;
 import com.example.marketing.model.entities.ConfigSystem;
 import com.example.marketing.model.entities.DataConnection;
 import com.example.marketing.model.entities.Work;
@@ -41,6 +42,8 @@ public class WorkService {
     private TaskRepository taskRepository;
     @Autowired
     private TaskInfoRepository taskInfoRepository;
+    @Autowired
+    private DataConnectService dataConnectService;
 
 
     public String modifyWork(Work body, String createdBy){
@@ -71,6 +74,7 @@ public class WorkService {
                 work.setScriptId(body.getScriptId());
                 work.setScriptName(body.getScriptName());
                 work.setIdStocks(body.getIdStocks());
+                work.setStatus("");
 
                 Task task = taskRepository.findById(work.getTaskId()).orElse(null);
                 if(task == null){
@@ -124,12 +128,30 @@ public class WorkService {
     }
 
     public Page<Work> getWorksConnected(Pageable pageable, long taskId, long scriptId){
+        List<String> status = List.of("Rejected", "");
         // tìm tất cả các nhiệm vụ kêts nối đến kịch bản hiện tại
         List<DataConnection> dataConnections = dataConnectRepository.findAllByIdToAndConnected(scriptId, true);
         List<String> ids = dataConnections.stream().map(DataConnection::getIdFrom).collect(Collectors.toList());
-        Page<Work> works = workRepository.findAllByTaskIdAndIdIn(taskId, ids, pageable);
+        Page<Work> works = workRepository.findAllByTaskIdAndIdInAndStatusNotIn(taskId, ids, status, pageable);
         return works;
     }
 
 
+    public String actionWork(String id, String username, ActionWorkDTO request){
+        Work work =workRepository.findById(id).orElse(null);
+        if(work == null){
+           return Constant.WORK_NOT_EXISTED;
+        }
+        if("accept".equalsIgnoreCase(request.getAction())){
+            work.setStatus("Accepted");
+            work.setAssignee(username);
+        } else if("reject".equalsIgnoreCase(request.getAction())){
+            work.setStatus("Rejected");
+            work.setRejectReason(request.getReason());
+            dataConnectService.unConnected(work.getId(), request.getScriptId());
+        }
+
+        workRepository.save(work);
+        return Constant.STATUS_SUCCESS;
+    }
 }

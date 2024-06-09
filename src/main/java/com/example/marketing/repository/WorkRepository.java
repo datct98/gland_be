@@ -10,8 +10,8 @@ import java.util.List;
 
 @Repository
 public interface WorkRepository extends MongoRepository<Work, String> {
-    Page<Work> findAllByTaskIdAndCreatedByOrderByCreatedAtDesc(long taskId, String createdBy, Pageable pageable);
-    Page<Work> findAllByTaskIdAndIdIn(long taskId, List<String> ids, Pageable pageable);
+    Page<Work> findAllByTaskIdAndCreatedByAndStatusInOrderByCreatedAtDesc(long taskId, String createdBy, List<String> status, Pageable pageable);
+    Page<Work> findAllByTaskIdAndIdInAndStatusNotIn(long taskId, List<String> ids, List<String> status, Pageable pageable);
     List<Work> findAllByIdWork(String idWork);
     List<Work> findAllByTaskId(long taskId);
     List<Work> findAllByTaskIdIn(List<Long> taskIds);

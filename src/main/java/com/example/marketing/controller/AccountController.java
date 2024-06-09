@@ -68,9 +68,9 @@ public class AccountController {
         if(userDTO == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
-        if("leader".equalsIgnoreCase(body.getRole()) && !userDTO.isAdmin()){
+        /*if("leader".equalsIgnoreCase(body.getRole()) && !userDTO.isAdmin()){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new DataResponse<>(403, "Not allow"));
-        }
+        }*/
         String responseCode = accountService.editUser(body);
         if(responseCode.equals(Constant.ACCOUNT_NOT_EXISTED)){
             return ResponseEntity.badRequest().body("Tài khoản không tồn tại");

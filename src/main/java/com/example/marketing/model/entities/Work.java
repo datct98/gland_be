@@ -39,6 +39,9 @@ public class Work {
     @Field(name = "created_by")
     private String createdBy;
     private String assignee;
+    private String status;
+    @Field(name = "reject_reason")
+    private String rejectReason;
 
     private List<Stock>idStocks;
 }

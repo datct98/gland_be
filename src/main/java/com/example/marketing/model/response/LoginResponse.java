@@ -10,6 +10,7 @@ public class LoginResponse {
     private boolean admin;
     private String accessToken;
     private String role;
+    private long userId;
 
     public LoginResponse(boolean admin, String accessToken) {
         this.admin = admin;
@@ -20,5 +21,12 @@ public class LoginResponse {
         this.admin = admin;
         this.accessToken = accessToken;
         this.role = role;
+    }
+
+    public LoginResponse(boolean admin, String accessToken, String role, long userId) {
+        this.admin = admin;
+        this.accessToken = accessToken;
+        this.role = role;
+        this.userId = userId;
     }
 }

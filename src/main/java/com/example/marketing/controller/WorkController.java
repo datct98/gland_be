@@ -1,5 +1,6 @@
 package com.example.marketing.controller;
 
+import com.example.marketing.model.dto.ActionWorkDTO;
 import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.Work;
 import com.example.marketing.model.response.DataResponse;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/work")
@@ -63,10 +67,11 @@ public class WorkController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
 
+        List<String> status = List.of("", "Rejected", "Assigned");
         pageNum = pageNum == null ? 0 : pageNum;
         pageSize = pageSize == null ? 10 : pageSize;
-        Page<Work> page = workRepository.findAllByTaskIdAndCreatedByOrderByCreatedAtDesc
-                (taskId,userDTO.getUsername(), PageRequest.of(pageNum, pageSize));
+        Page<Work> page = workRepository.findAllByTaskIdAndCreatedByAndStatusInOrderByCreatedAtDesc
+                (taskId,userDTO.getUsername(), status, PageRequest.of(pageNum, pageSize));
         return ResponseEntity.ok(new DataResponse<>(page.getContent(), page.getTotalPages()));
     }
 
@@ -86,6 +91,23 @@ public class WorkController {
         return ResponseEntity.ok(work);
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.DELETE)
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteWork (@RequestHeader(name="Authorization") String token,
+                                            @PathVariable String id){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+
+        Work work = workRepository.findById(id).orElse(null);
+        if(work == null){
+            return ResponseEntity.badRequest().body(new DataResponse<>(400,"Không tìm thấy id: "+id));
+        }
+        workRepository.delete(work);
+        return ResponseEntity.ok(work);
+    }
+
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
     @GetMapping("/connected")
     public ResponseEntity<?> getConnectedWorks (@RequestHeader(name="Authorization") String token,
@@ -102,5 +124,22 @@ public class WorkController {
         pageSize = pageSize == null ? 10 : pageSize;
         Page<Work> page = workService.getWorksConnected(PageRequest.of(pageNum, pageSize), taskId, scriptId);
         return ResponseEntity.ok(new DataResponse<>(page.getContent(), page.getTotalPages()));
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.POST)
+    @PostMapping("/action/{id}")
+    public ResponseEntity<?> actionWork (@RequestHeader(name="Authorization") String token,
+                                         @PathVariable String id,
+                                         @RequestBody ActionWorkDTO body){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+        String response = workService.actionWork(id, userDTO.getUsername(), body);
+        if(Constant.STATUS_SUCCESS.equals(response)){
+            return ResponseEntity.ok("Thao tác thành công");
+        }
+        return ResponseEntity.badRequest().body(new DataResponse<>(400, response));
+
     }
 }
