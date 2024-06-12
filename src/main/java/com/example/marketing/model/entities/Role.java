@@ -19,7 +19,7 @@ public class Role {
 @Data
 class DepartmentAllowed{
     private String departmentName;
-    private String departmentId;
+    private Long departmentId;
     private UserAllowed userAllowed;
     private WalletAllowed walletAllowed;
     private DataStockAllowed dataStockAllowed;
@@ -57,7 +57,7 @@ class ScriptAllowed{
 
 @Data
 class MissionsAllowed{
-    private String missionId;
+    private Long missionId;
     private String missionName;
     private Boolean isViewed;
     private Boolean isCreated;

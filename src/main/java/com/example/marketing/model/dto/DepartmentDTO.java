@@ -1,5 +1,6 @@
 package com.example.marketing.model.dto;
 
+import com.example.marketing.model.entities.Role;
 import com.example.marketing.model.entities.Script;
 import lombok.Data;
 
@@ -13,5 +14,6 @@ public class DepartmentDTO {
     private String noteDepartment;
     private Date createdDateDepartment;
     private List<Script> scripts;
+    private Role role;
 
 }

@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findAllByDepartmentIdAndStatusOrderByCreatedAtDesc(Long departmentId, boolean status, Pageable pageable);
 
     @Query("select new com.example.marketing.model.dto.UserDTO" +
-            "(u.id, u.username, u.admin, u.email, d.name, u.createdAt) from User  u " +
+            "(u.id, u.username, u.admin, u.email, d.id, d.name, u.createdAt) from User  u " +
             "left join Department  d on u.departmentId= d.id where (:departmentId is null or u.departmentId=:departmentId) " +
             "and u.status =true order by u.createdAt desc ")
     Page<UserDTO> findAllByDepartmentIdOrderByCreatedAtDesc(Long departmentId, Pageable pageable);

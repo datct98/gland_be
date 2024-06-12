@@ -4,6 +4,7 @@ import com.example.marketing.model.dto.DepartmentDTO;
 import com.example.marketing.model.dto.DepartmentScriptDTO;
 import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.Department;
+import com.example.marketing.model.entities.Role;
 import com.example.marketing.model.entities.Script;
 import com.example.marketing.model.entities.Work;
 import com.example.marketing.model.entities.script_setting.Task;
@@ -49,6 +50,8 @@ public class DepartmentService {
     private TaskScriptConfigService taskScriptConfigService;
     @Autowired
     private TypeIdService typeIdService;
+    @Autowired
+    private RoleService roleService;
 
     public void modifyDepartmentService(Department body, String username){
         // Tồn tại thì update
@@ -82,7 +85,7 @@ public class DepartmentService {
         return departmentRepository.findAllByCreatedBy(userDTO.getUsername(), userDTO.isAdmin());
     }
 
-    public List<DepartmentDTO> convertDepartmentScriptDTOsToDepartmentDTOs(List<DepartmentScriptDTO> departmentScriptDTOs) {
+    public List<DepartmentDTO> convertDepartmentScriptDTOsToDepartmentDTOs(List<DepartmentScriptDTO> departmentScriptDTOs, UserDTO userDTO) {
         Map<Long, List<DepartmentScriptDTO>> groupedDepartmentScriptDTOs = departmentScriptDTOs.stream()
                 .collect(Collectors.groupingBy(DepartmentScriptDTO::getDepartmentId));
 
@@ -115,6 +118,10 @@ public class DepartmentService {
             departmentDTO.setScripts(scripts);
 
             departmentDTOs.add(departmentDTO);
+        }
+        if(!userDTO.isAdmin()){
+            Role role = roleService.getRoleByUserId(userDTO.getId());
+            departmentDTOs.forEach(e->e.setRole(role));
         }
 
         return departmentDTOs;

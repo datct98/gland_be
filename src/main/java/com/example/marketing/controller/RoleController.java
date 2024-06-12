@@ -60,10 +60,6 @@ public class RoleController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
         Role role = roleService.getRoleByUserId(userId);
-        if(role != null){
-           return ResponseEntity.ok(new DataResponse<>(role));
-        }
-        log.error("cant find role of userId: "+userId);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không tìm thấy phân quyền");
+        return ResponseEntity.ok(new DataResponse<>(role));
     }
 }

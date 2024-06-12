@@ -58,7 +58,7 @@ public class ScriptController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new DataResponse<>(HttpStatus.BAD_REQUEST.value(), "Thao tác thất bại, vui lòng thử lại!"));
         }
         Page<DepartmentScriptDTO> departments = departmentService.getPageDepartments(userDTO, 0);
-        List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments.getContent());
+        List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments.getContent(), userDTO);
         // Check is admin -> authorization
         if(!userDTO.isAdmin())
             departmentDTOS = departmentDTOS.stream().filter(e-> Objects.equals(e.getDepartmentId(), userDTO.getDepartmentId())).collect(Collectors.toList());

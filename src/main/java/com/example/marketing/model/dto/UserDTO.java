@@ -25,11 +25,12 @@ public class UserDTO {
         this.departmentId = departmentId;
     }
 
-    public UserDTO(Long id, String username, boolean admin, String email, String departmentName, Date createdAt) {
+    public UserDTO(Long id, String username, boolean admin, String email, Long departmentId, String departmentName, Date createdAt) {
         this.id = id;
         this.username = username;
         this.admin = admin;
         this.email = email;
+        this.departmentId = departmentId;
         this.departmentName = departmentName;
         this.createdAt = createdAt;
     }

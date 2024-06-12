@@ -84,7 +84,7 @@ public class TaskController {
         if(userDTO == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
         }
-        List<Task> tasks = taskRepository.findAllByScriptIdIsNot(scriptId);
+        List<Task> tasks = taskRepository.findAllByScriptIdIsNot(0);
         return ResponseEntity.ok(new DataResponse<>(tasks));
     }
 

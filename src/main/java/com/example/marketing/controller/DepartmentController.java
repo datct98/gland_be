@@ -4,6 +4,7 @@ import com.example.marketing.model.dto.DepartmentDTO;
 import com.example.marketing.model.dto.DepartmentScriptDTO;
 import com.example.marketing.model.dto.UserDTO;
 import com.example.marketing.model.entities.Department;
+import com.example.marketing.model.entities.Role;
 import com.example.marketing.model.response.DataResponse;
 import com.example.marketing.repository.DepartmentRepository;
 import com.example.marketing.service.DepartmentService;
@@ -54,7 +55,7 @@ public class DepartmentController {
         }
         departmentService.modifyDepartmentService(body, userDTO.getUsername());
         Page<DepartmentScriptDTO> departments = departmentService.getPageDepartments(userDTO, 0);
-        List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments.getContent());
+        List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments.getContent(), userDTO);
 
         return ResponseEntity.ok(new DataResponse<>(HttpStatus.OK.value(), "Thực hiện thành công", departmentDTOS));
     }
@@ -69,15 +70,16 @@ public class DepartmentController {
         }
         if(pageNum!= null ){
             Page<DepartmentScriptDTO> departments = departmentService.getPageDepartments(userDTO, pageNum);
-            List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments.getContent());
+            List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments.getContent(), userDTO);
             if(!userDTO.isAdmin())
                 departmentDTOS = departmentDTOS.stream().filter(e-> Objects.equals(e.getDepartmentId(), userDTO.getDepartmentId())).collect(Collectors.toList());
             return ResponseEntity.ok(new DataResponse<>(departmentDTOS, departments.getTotalPages()));
         } else {
             List<DepartmentScriptDTO> departments = departmentService.getDepartments(userDTO);
-            List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments);
-            if(!userDTO.isAdmin())
+            List<DepartmentDTO> departmentDTOS = departmentService.convertDepartmentScriptDTOsToDepartmentDTOs(departments, userDTO);
+            if(!userDTO.isAdmin()){
                 departmentDTOS = departmentDTOS.stream().filter(e-> Objects.equals(e.getDepartmentId(), userDTO.getDepartmentId())).collect(Collectors.toList());
+            }
             return ResponseEntity.ok(new DataResponse<>(departmentDTOS));
         }
     }

@@ -149,6 +149,10 @@ public class WorkService {
             work.setStatus("Rejected");
             work.setRejectReason(request.getReason());
             dataConnectService.unConnected(work.getId(), request.getScriptId());
+        } else if("assign".equalsIgnoreCase(request.getAction())){
+            work.setStatus("Assigned");
+            work.setAssignee(request.getAssignee());
+            //dataConnectService.unConnected(work.getId(), request.getScriptId());
         }
 
         workRepository.save(work);
