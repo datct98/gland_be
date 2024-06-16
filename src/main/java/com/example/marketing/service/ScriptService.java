@@ -145,33 +145,52 @@ public class ScriptService {
     }
 
     public String connectData(List<DataConnection> bodies){
-        DataConnection connection;
         List<DataConnection> connections = new ArrayList<>();
         List<Work> works = new ArrayList<>();
 
         for (DataConnection body: bodies){
-            List<DataConnection> connectionsFound = dataConnectRepository.findAllByIdFromAndIdTo(body.getIdFrom(), body.getIdTo());
-            if(connectionsFound.size()>0){
-                connection = connectionsFound.get(0);
-                connection.setConnected(body.getConnected());
-            } else {
-                connection = new DataConnection();
-                connection.setIdFrom(body.getIdFrom());
-                connection.setIdTo(body.getIdTo());
-                connection.setConnected(body.getConnected());
-            }
             Work work = workRepository.findById(body.getIdFrom()).orElse(null);
             if(work == null){
                 return "Không tìm thấy work id:"+body.getIdFrom();
             }
             work.setStatus("Assigned");
+
+            // Khi giao việc thì cho phép giao đến cả kịch bản đã tạo ra công việc đó (work.getScriptId())
+            List<DataConnection> connectionsFound = dataConnectRepository.findAllByIdFromAndIdToIn(body.getIdFrom(), List.of(body.getIdTo(), work.getScriptId()));
+            boolean checkWorkScriptId = false;
+            if(connectionsFound.size()>0){
+                for (DataConnection dc: connectionsFound){
+                    if(dc.getIdTo() != work.getScriptId()){
+                        dc.setConnected(body.getConnected());
+                        connections.add(dc);
+                    } else {
+                        checkWorkScriptId = true;
+                    }
+                }
+            } else {
+                DataConnection connection = new DataConnection();
+                connection.setIdFrom(body.getIdFrom());
+                connection.setIdTo(body.getIdTo());
+                connection.setConnected(body.getConnected());
+                connections.add(connection);
+            }
+
+            if(!checkWorkScriptId){
+                // Thực hiện kết nối cv đến kịch bản đã tạo ra cv
+                DataConnection connection = new DataConnection();
+                connection.setIdFrom(body.getIdFrom());
+                connection.setIdTo(work.getScriptId());
+                connection.setConnected(false);
+                connections.add(connection);
+            }
+
             List<UserDTO> users = userRepository.findAllByRoleAndDepartmentId("leader",work.getDepartmentId());
             if(users.size() >0){
                 work.setAssignee(users.get(0).getUsername());
                 //work.setStatus("Assigned");
             }
             works.add(work);
-            connections.add(connection);
+
         }
         dataConnectRepository.saveAll(connections);
         if(works.size()>0)

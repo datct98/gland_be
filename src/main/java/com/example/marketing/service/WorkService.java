@@ -152,6 +152,7 @@ public class WorkService {
         } else if("assign".equalsIgnoreCase(request.getAction())){
             work.setStatus("Assigned");
             work.setAssignee(request.getAssignee());
+            dataConnectService.createNewConnect(id, request.getScriptId());
             //dataConnectService.unConnected(work.getId(), request.getScriptId());
         }
 

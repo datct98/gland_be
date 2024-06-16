@@ -37,4 +37,25 @@ public class DataConnectService {
         }
         dataConnectRepository.saveAll(connections);
     }
+
+    public void createNewConnect(String idFrom, long idToNew){
+        List<DataConnection> connections = dataConnectRepository.findAllByIdFrom(idFrom);
+        boolean checkIdToNewExisted = false;
+        for (DataConnection connection: connections){
+            if(connection.getIdTo() == idToNew){
+                checkIdToNewExisted = true;
+                connection.setConnected(true);
+            } else{
+                connection.setConnected(false);
+            }
+        }
+        if (!checkIdToNewExisted){
+            DataConnection connection = new DataConnection();
+            connection.setConnected(true);
+            connection.setIdFrom(idFrom);
+            connection.setIdTo(idToNew);
+            connections.add(connection);
+        }
+        dataConnectRepository.saveAll(connections);
+    }
 }

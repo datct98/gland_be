@@ -8,6 +8,7 @@ import java.util.List;
 public interface DataConnectRepository extends JpaRepository<DataConnection, Long> {
 
     List<DataConnection> findAllByIdFrom(String idFrom);
+    List<DataConnection> findAllByIdFromAndIdToIn(String idFrom, List<Long> idTos);
     List<DataConnection> findAllByIdFromAndIdTo(String idFrom, Long idTo);
     List<DataConnection> findAllByIdToAndConnected(long idTo, boolean connected);
     List<DataConnection> findAllByIdFromInOrIdToIn(List<String> idWorks, List<Long> idScripts);
