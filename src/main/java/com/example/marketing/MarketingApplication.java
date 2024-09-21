@@ -36,6 +36,7 @@ public class MarketingApplication extends SpringBootServletInitializer implement
         user.setAdmin(true);
         user.setPassword("123");
         accountService.createUser(user,"");*/
+        System.out.println("TOMCAT ======= START");
 
     }
 }
