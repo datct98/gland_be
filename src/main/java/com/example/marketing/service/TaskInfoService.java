@@ -48,6 +48,7 @@ public class TaskInfoService {
         taskInfo.setPreCode(body.getPreCode());
         taskInfo.setIncome(body.getIncome());
         taskInfo.setSpending(body.getSpending());
+        taskInfo.setOptionValue(body.getOptionValue());
         taskInfoRepository.save(taskInfo);
         return Constant.STATUS_SUCCESS;
     }

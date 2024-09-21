@@ -1,5 +1,6 @@
 package com.example.marketing.model.entities;
 
+import com.example.marketing.model.dto.StockDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,12 +44,5 @@ public class Work {
     @Field(name = "reject_reason")
     private String rejectReason;
 
-    private List<Stock>idStocks;
-}
-@Data
-class Stock{
-    long typeId;
-    String typeName;
-    //idCustom or idAuto
-    String idDataStock;
+    private List<StockDTO>idStocks;
 }

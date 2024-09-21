@@ -101,16 +101,29 @@ public class ScriptService {
         return dtos;
     }
 
+    /*public List<ScriptConnectDTO> getAssignedScripts(long departmentId, String idWork){
+        Work work = workRepository.findById(idWork).orElse(null);
+        if(work == null){
+            log.error("Không tìm thấy công vc có id: "+idWork);
+            return null;
+        }
+        List<Script> scripts = scriptRepository.findByIdIsNotAndDepartmentId(scriptId, departmentId, work.getTaskId());
+        List<DataConnection> connections = dataConnectRepository.findAllByIdFrom(idWork);
+        List<ScriptConnectDTO> dtos = scripts.stream()
+                .map(script -> new ScriptConnectDTO(script.getId(), script.getName(),
+                        connections.stream()
+                                .anyMatch(connection -> script.getId() == connection.getIdTo() && connection.getConnected())))
+                .collect(Collectors.toList());
+
+        return dtos;
+    }*/
+
     public String deleteById(long id, long departmentId, Boolean isAdmin){
         Script script = scriptRepository.findById(id).orElse(null);
         if(script == null)
             return Constant.SCRIPT_NOT_EXISTED;
         else {
             try {
-                if(!isAdmin && script.getDepartmentId()!= departmentId){
-                    log.error("User doesnt have permission to delete script id: "+id);
-                    return Constant.SYS_ERR;
-                }
                 List<Task> tasks = taskRepository.findAllByScriptId(id);
                 if(tasks.size()>0){
                     List<Long> idTasks = tasks.stream().map(Task::getId).collect(Collectors.toList());

@@ -126,6 +126,7 @@ public class TaskService {
                     infoNew.setDataType(info.getDataType());
                     infoNew.setField(info.getField());
                     infoNew.setTaskId(info.getTaskId());
+                    infoNew.setOptionValue(info.getOptionValue());
                     infoNews.add(infoNew);
                 }
                 taskInfoRepository.saveAll(infoNews);

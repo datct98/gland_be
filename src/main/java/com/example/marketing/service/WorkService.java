@@ -3,6 +3,7 @@ package com.example.marketing.service;
 import com.example.marketing.model.dto.ActionWorkDTO;
 import com.example.marketing.model.entities.ConfigSystem;
 import com.example.marketing.model.entities.DataConnection;
+import com.example.marketing.model.entities.HistoryWork;
 import com.example.marketing.model.entities.Work;
 import com.example.marketing.model.entities.script_setting.Task;
 import com.example.marketing.model.entities.script_setting.TaskInfo;
@@ -44,6 +45,8 @@ public class WorkService {
     private TaskInfoRepository taskInfoRepository;
     @Autowired
     private DataConnectService dataConnectService;
+    @Autowired
+    private HistoryWorkService historyWorkService;
 
 
     public String modifyWork(Work body, String createdBy){
@@ -56,7 +59,7 @@ public class WorkService {
                     log.error("#createWork khong tim thay Work id ={}", body.getId());
                     return Constant.WORK_NOT_EXISTED;
                 }
-
+                historyWorkService.saveHistory(body, createdBy, "update", work.getIdStocks());
                 work.setIdStocks(body.getIdStocks());
                 work.setData(body.getData());
                 workRepository.save(work);
@@ -117,6 +120,8 @@ public class WorkService {
                 work.setIncome(body.getIncome());
                 work.setSpending(body.getSpending());
                 workRepository.save(work);
+                // Lưu lịch sử
+                historyWorkService.saveHistory(work, createdBy, "create", null);
             }
 
         } catch (Exception e){

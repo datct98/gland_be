@@ -130,4 +130,19 @@ public class ScriptController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new DataResponse<>(Constant.MESSAGE_ERR.get(responseCode)));
         return ResponseEntity.ok(new DataResponse<>(Constant.MESSAGE_ERR.get(responseCode)));
     }
+
+    /*@CrossOrigin(origins = "*", allowedHeaders = "*", methods = RequestMethod.GET)
+    @Operation(description = "Get other scripts")
+    @GetMapping("/allowed-assign")
+    public ResponseEntity<?> getAssignedScripts(@RequestHeader(name="Authorization") String token,
+                                             @RequestParam long departmentId,
+                                             @RequestParam String idWork){
+        UserDTO userDTO = jwtUtil.validateTokenAndGetUsername(token);
+        if(userDTO == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new DataResponse<>(HttpStatus.UNAUTHORIZED.value(), "Xác thực thất bại, vui lòng đăng nhập lại!"));
+        }
+        List<ScriptConnectDTO> scripts = scriptService.getOtherScripts(scriptId, departmentId, idWork);
+
+        return ResponseEntity.ok(new DataResponse<>(scripts));
+    }*/
 }

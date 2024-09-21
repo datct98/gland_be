@@ -24,6 +24,9 @@ public class TaskInfo {
     private String field;
     @Column(name = "data_type")
     private String dataType;
+    // Chỉ dùng khi dataType = dropdown
+    @Column(name = "option_value") // Nam, nữ
+    private String optionValue;
     @Column(name = "require_input")
     private Boolean requireInput;
     @Column(name = "display_on_list")
